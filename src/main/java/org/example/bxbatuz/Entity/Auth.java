@@ -23,4 +23,10 @@ public class Auth extends BaseEntity {
     @Column
     @Enumerated(EnumType.STRING)
     private AuthRole role;
+
+    public static Auth createAuth(String email,
+                                  String password,
+                                  AuthRole role){
+        return new Auth(email, password, role);
+    }
 }

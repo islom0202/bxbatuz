@@ -1,37 +1,84 @@
 package org.example.bxbatuz.Service;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.example.bxbatuz.Dto.AddEmployee;
 import org.example.bxbatuz.Dto.SignupRequest;
 import org.example.bxbatuz.Entity.Auth;
 import org.example.bxbatuz.Entity.Company;
+import org.example.bxbatuz.Entity.Department;
+import org.example.bxbatuz.Entity.Employees;
 import org.example.bxbatuz.Enum.AuthRole;
+import org.example.bxbatuz.Factory.EmployeesFactory;
+import org.example.bxbatuz.PasswordGenerator;
 import org.example.bxbatuz.Repo.AuthRepo;
 import org.example.bxbatuz.Repo.CompanyRepo;
+import org.example.bxbatuz.Repo.DepartmentRepo;
+import org.example.bxbatuz.Repo.EmployeesRepo;
 import org.example.bxbatuz.Response;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
+import java.util.concurrent.CompletableFuture;
+
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CompanyService {
     private final CompanyRepo companyRepo;
     private final AuthRepo authRepo;
+    private final DepartmentRepo departmentRepo;
+    private final EmployeesRepo employeesRepo;
     private final PasswordEncoder passwordEncoder;
-
+    private final EmailService emailService;
     @Transactional
     public Response save(SignupRequest request) {
-        Auth auth = authRepo.save(new Auth(
-                request.email(),
+        Auth auth = authRepo.save(Auth.createAuth(request.email(),
                 passwordEncoder.encode(request.password()),
                 AuthRole.COMPANY));
 
-        Company company = new Company();
-        company.setId(auth.getId());
-        company.setAuth(auth);
-        company.setName(request.companyName());
-        company.setEmpCount(request.empCount());
+        Company company = new Company(auth.getId(),
+                request.companyName(),
+                request.empCount(),
+                auth);
+
         companyRepo.save(company);
-        return new Response("company saved", true);
+
+        return new Response("Company saved successfully", true);
     }
+
+    @Transactional
+    public Response addEmployee(AddEmployee request) {
+        String password = PasswordGenerator.generatePassword();
+
+        CompletableFuture.runAsync(() ->
+                emailService.sendEmailToEmployee(request.email(), password));
+
+        CompletableFuture<Auth> authFuture = CompletableFuture
+                .supplyAsync(() -> authRepo.save(
+                        Auth.createAuth(request.email(),
+                                passwordEncoder.encode(password),
+                                AuthRole.USER)));
+
+        CompletableFuture<Company> companyFuture = CompletableFuture
+                .supplyAsync(() -> companyRepo.findById(request.companyId())
+                .orElseThrow(() -> new NoSuchElementException("Company not found")));
+
+        CompletableFuture<Department> departmentFuture = CompletableFuture
+                .supplyAsync(() -> departmentRepo.findById(request.departmentId())
+                .orElseThrow(() -> new NoSuchElementException("Department not found")));
+
+        CompletableFuture.allOf(authFuture, companyFuture, departmentFuture).join();
+
+        Auth auth = authFuture.join();
+        Company company = companyFuture.join();
+        Department department = departmentFuture.join();
+
+        Employees employee = EmployeesFactory.createEmployee(auth, request, company, department);
+
+        employeesRepo.save(employee);
+
+        return new Response("saved", true);
+    }
+
 }
