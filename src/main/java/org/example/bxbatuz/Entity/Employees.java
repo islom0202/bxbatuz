@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table
@@ -27,14 +29,23 @@ public class Employees implements Serializable {
     private String position;
 
     @JoinColumn
-    @ManyToOne(fetch = FetchType.LAZY)
+    private Double officialWorkHours;
+
+    @JoinColumn
+    private LocalTime startTime;
+
+    @JoinColumn
+    private LocalTime endTime;
+
+    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Company company;
 
     @JoinColumn
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Department department;
 
     @JoinColumn
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     private Auth auth;
 }

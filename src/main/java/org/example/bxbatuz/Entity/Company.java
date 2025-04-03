@@ -23,6 +23,6 @@ public class Company implements Serializable {
     private int empCount;
 
     @JoinColumn
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     private Auth auth;
 }
