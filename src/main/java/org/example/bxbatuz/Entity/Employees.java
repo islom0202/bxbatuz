@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -48,4 +47,30 @@ public class Employees implements Serializable {
     @JoinColumn
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     private Auth auth;
+
+    @JoinColumn
+    @OneToOne(cascade = CascadeType.ALL)
+    private Files image;
+
+    public Employees(Long id,
+                     String fullName,
+                     String phone,
+                     String position,
+                     Double officialWorkHours,
+                     LocalTime startTime,
+                     LocalTime endTime,
+                     Company company,
+                     Department department,
+                     Auth auth) {
+        this.id = id;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.position = position;
+        this.officialWorkHours = officialWorkHours;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.company = company;
+        this.department = department;
+        this.auth = auth;
+    }
 }

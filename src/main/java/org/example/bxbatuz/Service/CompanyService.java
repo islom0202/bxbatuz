@@ -40,6 +40,7 @@ public class CompanyService {
         Company company = new Company(auth.getId(),
                 request.companyName(),
                 request.empCount(),
+                request.address(),
                 auth);
 
         companyRepo.save(company);
@@ -50,9 +51,6 @@ public class CompanyService {
     @Transactional
     public Response addEmployee(AddEmployee request) {
         String password = PasswordGenerator.generatePassword();
-
-        CompletableFuture.runAsync(() ->
-                emailService.sendEmailToEmployee(request.email(), password));
 
         CompletableFuture<Auth> authFuture = CompletableFuture
                 .supplyAsync(() -> authRepo.save(
@@ -77,6 +75,13 @@ public class CompanyService {
         Employees employee = EmployeesFactory.createEmployee(auth, request, company, department);
 
         employeesRepo.save(employee);
+
+        //todo: if any exception is happened,
+        // use event listener to trigger email sending when db transaction is end
+        // or use TransactionSynchronizationManager with afterCommit()
+
+        CompletableFuture.runAsync(() ->
+                emailService.sendEmailToEmployee(request.email(), password));
 
         return new Response("saved", true);
     }

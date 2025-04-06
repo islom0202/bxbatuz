@@ -10,6 +10,7 @@ public record SignupRequest(
         @NotBlank(message = "work email is required")
         @Size(min = 6)
         String email,
+        String address,
         @NotBlank(message = "password is required")
         @Size(min = 4, message = "password must be 4 character at least")
         String password

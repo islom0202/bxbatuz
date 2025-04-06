@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.example.bxbatuz.Entity.Auth;
+import org.example.bxbatuz.Enum.AuthRole;
 import org.example.bxbatuz.Repo.AuthRepo;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,6 +40,8 @@ public class JwtUtil {
         Auth auth = authRepo.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new NoSuchElementException("error in fetching user data"));
 
+        String authRole = auth.getRole().equals(AuthRole.USER) ? "userId" : "companyId";
+
         String roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -46,9 +49,9 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))  // 24 hours
+                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
                 .claim("role", roles)
-                .claim("authId", auth.getId() != null ? auth.getId() : 0)
+                .claim(authRole, auth.getId())
                 .signWith(getKey())
                 .compact();
     }

@@ -23,6 +23,25 @@ public class Company implements Serializable {
     private int empCount;
 
     @JoinColumn
+    private String address;
+
+    @JoinColumn
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     private Auth auth;
+
+    @JoinColumn
+    @OneToOne(cascade = CascadeType.ALL)
+    private Files image;
+
+    public Company(Long id,
+                   String name,
+                   int empCount,
+                   String address,
+                   Auth auth) {
+        this.id = id;
+        this.name = name;
+        this.empCount = empCount;
+        this.address = address;
+        this.auth = auth;
+    }
 }
