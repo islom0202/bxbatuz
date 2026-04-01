@@ -43,6 +43,7 @@ public class AdminService {
                 .username(req.phone())
                 .password(passwordEncoder.encode(req.password()))
                 .role(req.role())
+                .isActive(true)
                 .createdAt(LocalDateTime.now())
                 .build());
         return ResponseEntity.ok("yaratildi");
