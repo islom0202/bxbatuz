@@ -5,8 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 @SpringBootApplication
 public class BxbatuzApplication {
@@ -17,10 +17,10 @@ public class BxbatuzApplication {
 
     @Bean
     public DatabaseReader databaseReader() throws IOException {
-        InputStream dbStream = getClass().getResourceAsStream("/GeoLite2-City.mmdb");
-        if (dbStream == null) {
-            throw new IOException("Database file not found in resources/geo/GeoLite2-City.mmdb");
+        File dbFile = new File("/home/ec2-user/app/GeoLite2-City.mmdb");
+        if (!dbFile.exists()) {
+            throw new IOException("Database file not found: " + dbFile.getAbsolutePath());
         }
-        return new DatabaseReader.Builder(dbStream).build();
+        return new DatabaseReader.Builder(dbFile).build();
     }
 }
