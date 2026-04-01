@@ -17,7 +17,7 @@ public class BxbatuzApplication {
 
     @Bean
     public DatabaseReader databaseReader() throws IOException {
-        InputStream dbStream = getClass().getResourceAsStream("GeoLite2-City.mmdb");
+        InputStream dbStream = getClass().getResourceAsStream("/GeoLite2-City.mmdb");
         if (dbStream == null) {
             throw new IOException("Database file not found in resources/geo/GeoLite2-City.mmdb");
         }
