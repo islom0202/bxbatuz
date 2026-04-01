@@ -45,43 +45,45 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            APP_DIR="/home/${{ secrets.SERVER_USER }}/app"
-            
-            mkdir -p $APP_DIR
-            
-            sudo dnf install -y java-21-amazon-corretto-headless procps curl
+            set -e
 
-            EXECUTABLE_JAR=$(ls $APP_DIR/*.jar | grep -v 'plain.jar' | head -n 1)
+            APP_DIR="/home/${{ secrets.SERVER_USER }}/app"
+            mkdir -p "$APP_DIR"
+
+            sudo dnf install -y java-21-amazon-corretto-headless procps-ng
+
+            java -version
+
+            EXECUTABLE_JAR=$(ls "$APP_DIR"/*.jar | grep -v 'plain.jar' | head -n 1)
             if [ -z "$EXECUTABLE_JAR" ]; then
               echo "ERROR: No executable JAR file found. Aborting."
               exit 1
             fi
             echo "Found executable JAR: $EXECUTABLE_JAR"
 
-            PID=$(ps -f | grep "$EXECUTABLE_JAR" | grep -v grep | awk '{print $2}')
+            PID=$(ps -ef | grep "$EXECUTABLE_JAR" | grep -v grep | awk '{print $2}')
             if [ -n "$PID" ]; then
               echo "Stopping old process with PID: $PID"
-              kill -15 $PID
-              while ps -p $PID > /dev/null; do sleep 1; done
+              kill -15 "$PID"
+              while ps -p "$PID" > /dev/null; do sleep 1; done
               echo "Process stopped."
             else
               echo "No old process found. Skipping."
             fi
 
             echo "Starting new application: $EXECUTABLE_JAR"
-            nohup java -jar $EXECUTABLE_JAR > $APP_DIR/app.log 2>&1 & disown
+            nohup java -jar "$EXECUTABLE_JAR" > "$APP_DIR/app.log" 2>&1 &
 
-            echo "Deployment script finished. Waiting for application to start..."
             sleep 15
 
             echo "--- Displaying application log (app.log) ---"
-            cat $APP_DIR/app.log
+            cat "$APP_DIR/app.log" || true
 
             echo "--- Checking for running Java process ---"
-            ps aux | grep "[j]ava -jar" || echo "ERROR: Java process not found!"
+            ps aux | grep "[j]ava -jar" || (echo "ERROR: Java process not found!" && exit 1)
 
-            echo "--- Checking application health on localhost:8081 ---"
-            curl -f http://localhost:8081 || echo "ERROR: Application not responding on port 8081. Check app.log for errors."
+            echo "--- Checking application health on localhost:9091 ---"
+            curl -f http://localhost:9091 || (echo "ERROR: Application not responding on port 9091. Check app.log for errors." && exit 1)
         env:
           SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USER }}
