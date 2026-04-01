@@ -35,7 +35,7 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
     private final AdminDetailsRepo adminDetailsRepo;
     private final AuthenticationManager authenticationManager;
-    private static final String BASE_URI = "localhost:9091/form/";
+    private static final String BASE_URI = "http://13.60.74.117:9091/form/";
 
     public ResponseEntity<String> createAdmin(SaveAdminReq req) {
         adminDetailsRepo.save(AdminDetails.builder()
