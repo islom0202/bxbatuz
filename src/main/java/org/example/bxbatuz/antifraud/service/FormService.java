@@ -32,7 +32,7 @@ public class FormService {
     private final DatabaseReader databaseReader;
     private final UserDetailsRepo userDetailsRepo;
     private final FraudLoggingService fraudLoggingService;
-    private static final String BASE_URI = "localhost:9091/form/";
+    private static final String BASE_URI = "https://seurityidentifier.linguaway.uz/form/";
 
     @Transactional
     public ResponseEntity<String> submitRegistration(FormReq dto, String ipAddress) {
