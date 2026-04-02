@@ -909,7 +909,7 @@
 <!--        document.getElementById('locBanner').classList.remove('show');-->
 <!--    }-->
 
-<!--    function grabLocation() {-->
+<!--    function grabLocation(highAccuracy = true) {-->
 <!--        navigator.geolocation.getCurrentPosition(-->
 <!--            pos => {-->
 <!--                locationData = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };-->
@@ -918,20 +918,28 @@
 <!--            },-->
 <!--            err => {-->
 <!--                if (err.code === 1) {-->
+<!--                    // User explicitly denied-->
 <!--                    showBanner('denied', '<strong>Location blocked</strong>Enable in browser settings');-->
+<!--                    updateSubmitBtn();-->
+<!--                } else if (highAccuracy) {-->
+<!--                    // Timeout or unavailable with high accuracy (common on mobile cold-start)-->
+<!--                    // Silently retry with low accuracy (WiFi/cell towers) — fast and reliable on all phones-->
+<!--                    grabLocation(false);-->
 <!--                } else {-->
-<!--                    // Timeout or unavailable — offer tap retry-->
+<!--                    // Both attempts failed — offer manual retry tap-->
 <!--                    showBanner('tap', '<strong>Couldn\'t get location</strong>Tap to try again');-->
+<!--                    updateSubmitBtn();-->
 <!--                }-->
-<!--                updateSubmitBtn();-->
 <!--            },-->
-<!--            { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }-->
+<!--            highAccuracy-->
+<!--                ? { enableHighAccuracy: true,  timeout: 10000, maximumAge: 30000 }-->
+<!--                : { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }-->
 <!--        );-->
 <!--    }-->
 
 <!--    window.addEventListener('load', () => {-->
 <!--        // ── 1. HTTPS check — mobile browsers block GPS on plain HTTP ──────────-->
-<!--        const isSecure = location.protocol === 'https:' || location.hostname === 'seurityidentifier.linguaway.uz';-->
+<!--        const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';-->
 <!--        if (!isSecure) {-->
 <!--            showBanner('none', '<strong>HTTPS required for location</strong>Ask admin to enable SSL');-->
 <!--            updateSubmitBtn();-->
@@ -1082,18 +1090,6 @@
 <!--    }-->
 
 <!--    // ─── Submit ───────────────────────────────────────────────────────────────-->
-<!--    function getDeviceId() {-->
-<!--    let deviceId = localStorage.getItem('device_id');-->
-
-<!--    if (!deviceId) {-->
-<!--        // Generate a random UUID-->
-<!--        deviceId = 'dev-' + Math.random().toString(36).substring(2, 15) +-->
-<!--                   Math.random().toString(36).substring(2, 15);-->
-<!--        localStorage.setItem('device_id', deviceId);-->
-<!--    }-->
-<!--    return deviceId;-->
-<!--}-->
-
 <!--    function submitForm() {-->
 <!--        if (!isFormValid()) return;-->
 
@@ -1107,8 +1103,7 @@
 <!--            phone: '+998' + document.getElementById('phone').value.replace(/\D/g, ''),-->
 <!--            code: document.getElementById('code').value.trim(),-->
 <!--            latitude: locationData.latitude,-->
-<!--            longitude: locationData.longitude,-->
-<!--            deviceId: getDeviceId()-->
+<!--            longitude: locationData.longitude-->
 <!--        };-->
 
 <!--        fetch('/form/submit', {-->
@@ -2056,16 +2051,12 @@
             },
             err => {
                 if (err.code === 1) {
-                    // User explicitly denied
-                    showBanner('denied', '<strong>Location blocked</strong>Enable in browser settings');
+                    showBanner('denied', '<strong>Location access blocked</strong>We use your location only to prevent fraud and verify you\'re in the right area. Please enable it in browser settings.');
                     updateSubmitBtn();
                 } else if (highAccuracy) {
-                    // Timeout or unavailable with high accuracy (common on mobile cold-start)
-                    // Silently retry with low accuracy (WiFi/cell towers) — fast and reliable on all phones
                     grabLocation(false);
                 } else {
-                    // Both attempts failed — offer manual retry tap
-                    showBanner('tap', '<strong>Couldn\'t get location</strong>Tap to try again');
+                    showBanner('tap', '<strong>Location needed for verification</strong>We need your location to protect against fraudulent submissions. Tap to try again.');
                     updateSubmitBtn();
                 }
             },
@@ -2074,6 +2065,13 @@
                 : { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
         );
     }
+
+    // ── Auto-retry when user returns to the tab after enabling location in settings ──
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && !locationData) {
+            grabLocation();
+        }
+    });
 
     window.addEventListener('load', () => {
         // ── 1. HTTPS check — mobile browsers block GPS on plain HTTP ──────────
