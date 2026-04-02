@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ResponseMsg {
-    PHONE_ALREADY_REGISTERED_LOG("Phone Number Duplication: Phone number already registered."),
-    AREA_ALREADY_OCCUPIED_LOG("Proximity Violation: Spot within 500m already claimed."),
-    LOCATION_MISMATCH_LOG("Location Mismatch: GPS and IP are %s km apart."),
-    SUCCESS("Saved successfully!"),
-    PHONE_ALREADY_REGISTERED("Phone number already registered."),
-    AREA_ALREADY_OCCUPIED("This area is already registered"),
-    DEVICE_DUPLICATED("Yuo have been reported before"),
-    LOCATION_MISMATCH("Security alert: Location inconsistency detected."),
-    LINK_EXPIRED("Link is expired.");
+    PHONE_ALREADY_REGISTERED_LOG("Telfon raqam: Bunday raqam bilan oldin yuborilgan!"),
+    AREA_ALREADY_OCCUPIED_LOG("Joylashuv noaniqlik: 1km hudud ichida"),
+    LOCATION_MISMATCH_LOG("Joylashuvda noaniqlik: GPS va IP %s km uzoqlikda"),
+    SUCCESS("Saqlandi!"),
+    PHONE_ALREADY_REGISTERED("Telfon raqam mavjud!"),
+    AREA_ALREADY_OCCUPIED("Bu hududdan yuborilgan!"),
+    DEVICE_DUPLICATED("Sizning ID yingiz mavjud!"),
+    LOCATION_MISMATCH("Joylashuvda xatolik aniqlanda!"),
+    LINK_EXPIRED("Havola yaroqsiz!");
     private final String message;
 }

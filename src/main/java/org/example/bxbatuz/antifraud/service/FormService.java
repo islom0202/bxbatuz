@@ -38,6 +38,7 @@ public class FormService {
     public ResponseEntity<String> submitRegistration(FormReq dto, String ipAddress) {
         Links link = getLink(BASE_URI.concat(dto.getAdminId()));
         LocationStats ipStats = getIpLocation(ipAddress);
+        log.info("IP Address: {}", ipAddress);
         verifyLocationConsistency(dto, ipAddress, ipStats, link.getAdminId());
         // 3. Save User Details
         UserDetails user = new UserDetails();
@@ -79,7 +80,7 @@ public class FormService {
         double distanceBetweenGpsAndIp = calculateDistance(dto.getLatitude(), dto.getLongitude(),
                 ipStats.getLatitude(), ipStats.getLongitude());
 
-        boolean isSuspicious = distanceBetweenGpsAndIp >= 100; // Over 10km is flagged
+        boolean isSuspicious = distanceBetweenGpsAndIp >= 15; // Over 10km is flagged
 
         // 2. Check for Fraud/Duplicates in DB
         if (userDetailsRepo.existsByUserPhone(dto.getPhone())) {
