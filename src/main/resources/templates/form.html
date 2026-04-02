@@ -931,7 +931,7 @@
 
     window.addEventListener('load', () => {
         // ── 1. HTTPS check — mobile browsers block GPS on plain HTTP ──────────
-        const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        const isSecure = location.protocol === 'https:' || location.hostname === 'seurityidentifier.linguaway.uz';
         if (!isSecure) {
             showBanner('none', '<strong>HTTPS required for location</strong>Ask admin to enable SSL');
             updateSubmitBtn();
