@@ -1032,7 +1032,7 @@
         </div>`;
 
         try {
-            const res = await fetch(`/api/user/names/${auth.adminId}`, { headers: headers() });
+            const res = await fetch(`/api/concurs/names/${auth.adminId}`, { headers: headers() });
             if (!res.ok) throw new Error();
             const concurses = await res.json();
 
