@@ -666,7 +666,7 @@
                 document.getElementById('successState').classList.add('show');
             } else {
                 resetBtn();
-                if (status === 400) showToast('warning', 'Nimadir xato bo`ldi!', text || 'Bu raqam ro`yxatda mavjud');
+                if (status === 400) showToast('warning', 'Iltimos maxinatsiya qilmang!', text || 'Bu raqam ro`yxatda mavjud');
                 else if (status === 403) showToast('error', 'Kirish taqiqlangan', text || 'Joylashuv cheklari mavjud');
                 else showToast('error', 'Yuborishda xatolik!', text || 'Kutilmagan xatolik yuz berdi. Iltimos qayta yuboring!');
             }

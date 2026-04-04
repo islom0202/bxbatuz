@@ -11,8 +11,8 @@ public enum ResponseMsg {
     LOCATION_MISMATCH_LOG("Joylashuvda noaniqlik: GPS va IP %s km uzoqlikda"),
     SUCCESS("Saqlandi!"),
     PHONE_ALREADY_REGISTERED("Telfon raqam mavjud!"),
-    AREA_ALREADY_OCCUPIED("Bu hududdan yuborilgan!"),
-    DEVICE_DUPLICATED("Sizning ID yingiz bu konkursda mavjud!"),
+    AREA_ALREADY_OCCUPIED("Bu hududdan yuborilgan iltimos maxinatsiya qilmang!"),
+    DEVICE_DUPLICATED("Sizning ID yingiz bu konkursda mavjud iltimos maxinatsiya qilmang!"),
     DEVICE_DUPLICATED_LOG("Ko`plab qurilmadan yuborish holati mavjud!"),
     LOCATION_MISMATCH("Joylashuvda xatolik aniqlandi!"),
     LINK_EXPIRED("Havola yaroqsiz!");
