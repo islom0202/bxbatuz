@@ -106,7 +106,7 @@ public class FormService {
         double distanceBetweenGpsAndIp = calculateDistance(dto.getLatitude(), dto.getLongitude(),
                 ipStats.getLatitude(), ipStats.getLongitude());
         System.out.println("distanceBetweenGpsAndIp: " + distanceBetweenGpsAndIp + "username: " +  dto.getPhone());
-        boolean isSuspicious = distanceBetweenGpsAndIp >= 400; // Over 400km is flagged
+        boolean isSuspicious = distanceBetweenGpsAndIp >= 2000; // Over 400km is flagged
 
         if (isSuspicious) {
             fraudLoggingService.logFraud(
