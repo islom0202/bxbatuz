@@ -1282,11 +1282,11 @@
             <div class="form-hint" id="concursHint">// yuklanmoqda...</div>
         </div>
 
-        <div class="form-group">
-            <label class="form-label">Muddat (daqiqalarda)</label>
-            <input type="number" id="expireInput" class="form-input" value="60" min="1">
-            <div class="form-hint">// 60 = 1 soat · 1440 = 1 kun</div>
-        </div>
+<!--        <div class="form-group">-->
+<!--            <label class="form-label">Muddat (daqiqalarda)</label>-->
+<!--            <input type="number" id="expireInput" class="form-input" value="60" min="1">-->
+<!--            <div class="form-hint">// 60 = 1 soat · 1440 = 1 kun</div>-->
+<!--        </div>-->
 
         <div class="modal-footer">
             <button class="btn-ghost" onclick="closeModal()">Bekor qilish</button>
@@ -1610,7 +1610,7 @@
         hint.textContent = '// yuklanmoqda...';
 
         try {
-            const res = await fetch(`${API_CONCURS}/names`, { headers: authHeaders() });
+            const res = await fetch(`${API_CONCURS}/names/${auth.adminId}`, { headers: authHeaders() });
             if (!res.ok) throw new Error();
             const list = await res.json(); // [{id, name}]
 
@@ -1636,7 +1636,7 @@
 
     // ── Create modal ──
     function openCreateModal() {
-        document.getElementById('expireInput').value = '60';
+<!--        document.getElementById('expireInput').value = '60';-->
         document.getElementById('createModal').classList.add('open');
         loadConcursNames();
     }
@@ -1644,19 +1644,19 @@
 
     async function submitCreateLink() {
         const concursId  = document.getElementById('concursSelect').value;
-        const expireTime = document.getElementById('expireInput').value;
+<!--        const expireTime = document.getElementById('expireInput').value;-->
         const btn        = document.getElementById('btnSubmit');
 
         if (!concursId)              { showToast('Konkursni tanlang', 'error'); return; }
-        if (!expireTime || +expireTime < 1) { showToast('Muddatni kiriting', 'error'); return; }
+<!--        if (!expireTime || +expireTime < 1) { showToast('Muddatni kiriting', 'error'); return; }-->
 
         btn.textContent = 'Yaratilmoqda...';
         btn.disabled = true;
 
         try {
-            // POST /api/admin/create-link/{adminId}?concursId={concursId}&expireTime={expireTime}
+            // POST /api/admin/create-link/{adminId}?concursId={concursId}
             const res = await fetch(
-                `${API_ADMIN}/create-link/${auth.adminId}?concursId=${concursId}&expireTime=${expireTime}`,
+                `${API_ADMIN}/create-link/${auth.adminId}?concursId=${concursId}`,
                 { method: 'POST', headers: authHeaders() }
             );
             if (!res.ok) throw new Error();

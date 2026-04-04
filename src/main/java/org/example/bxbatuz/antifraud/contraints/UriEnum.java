@@ -7,5 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UriEnum {
     BASE_URI("https://seurityidentifier.linguaway.uz/form/");
+//    BASE_URI("http://localhost:9091/form/");
     private final String val;
 }
