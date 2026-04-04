@@ -1,28 +1,68 @@
 package org.example.bxbatuz.antifraud.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.bxbatuz.antifraud.dto.AdminLinks;
-import org.example.bxbatuz.antifraud.dto.LinkedUsersRes;
-import org.example.bxbatuz.antifraud.dto.UsersList;
-import org.example.bxbatuz.antifraud.entity.AdminDetails;
-import org.example.bxbatuz.antifraud.entity.UserDetails;
-import org.example.bxbatuz.antifraud.repo.AdminDetailsRepo;
-import org.example.bxbatuz.antifraud.repo.LinkRepo;
-import org.example.bxbatuz.antifraud.repo.LinkedUsersRepo;
-import org.example.bxbatuz.antifraud.repo.UserDetailsRepo;
+import org.example.bxbatuz.antifraud.dto.*;
+import org.example.bxbatuz.antifraud.entity.*;
+import org.example.bxbatuz.antifraud.repo.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final LinkRepo linkRepo;
+    private final ConcursRepo concursRepo;
     private final AdminService adminService;
     private final UserDetailsRepo userDetailsRepo;
     private final LinkedUsersRepo linkedUsersRepo;
     private final AdminDetailsRepo adminDetailsRepo;
+
+    @Transactional
+    public void logUserAndLink(
+            UserDetails userDetail,
+            FormReq dto,
+            String ipAddress,
+            LocationStats ipStats,
+            Links link){
+        Long userId;
+        if (userDetail == null){
+            UserDetails user = new UserDetails();
+            user.setUserPhone(dto.getPhone());
+            user.setUserIp(ipAddress);
+            user.setLatitude(dto.getLatitude());
+            user.setLongitude(dto.getLongitude());
+            user.setIpLatitude(ipStats.getLatitude());
+            user.setIpLongitude(ipStats.getLongitude());
+            user.setUserDeviceId(dto.getDeviceId());
+            user.setIsFraud(false);
+            user.setAdminId(link.getAdminId());
+            user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            user = userDetailsRepo.save(user);
+            userId = user.getId();
+        }
+        else userId = userDetail.getId();
+
+        // 4. Link User to the Admin's Link
+        LinkedUsers linkRelation = new LinkedUsers();
+        linkRelation.setLinkId(link.getId());
+        linkRelation.setUserId(userId);
+        linkRelation.setUserCode(dto.getCode());
+        linkRelation.setSentAt(Timestamp.valueOf(LocalDateTime.now()));
+        linkRelation.setClickedAt(Timestamp.valueOf(LocalDateTime.now()));
+        linkRelation.setUserCode(dto.getPhone());
+        linkRelation.setUserDeviceId(dto.getDeviceId());
+        linkRelation.setConcursId(link.getConcursId());
+        linkRelation.setLatitude(dto.getLatitude());
+        linkRelation.setLongitude(dto.getLongitude());
+        linkRelation.setIpLatitude(ipStats.getLatitude());
+        linkRelation.setIpLongitude(ipStats.getLongitude());
+        linkedUsersRepo.save(linkRelation);
+    }
 
     public ResponseEntity<List<UserDetails>> all(Boolean isFraud) {
         return isFraud == null
@@ -55,5 +95,75 @@ public class UserService {
             return adminService.linkList();
         else
             return adminService.linksByAdminId(adminId);
+    }
+
+    public ResponseEntity<String> updateStatus(Long linkId, Boolean status) {
+        Links link = linkRepo.findById(linkId).orElseThrow(() -> new RuntimeException("Havola topilmadi!"));
+        link.setIsExpired(status);
+        linkRepo.save(link);
+        return ResponseEntity.ok("Yangilandi!");
+    }
+
+    public ResponseEntity<String> delete(Long linkId) {
+        linkRepo.deleteById(linkId);
+        return ResponseEntity.ok("O`chirildi!");
+    }
+
+    public ResponseEntity<String> createConcurs(CreateConcursReq req) {
+        concursRepo.save(Concurs.builder()
+                .name(req.name())
+                .description(req.description())
+                .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                .isActive(true)
+                .adminId(req.adminId())
+                .build());
+        return ResponseEntity.ok("Yaratildi!");
+    }
+
+    public ResponseEntity<List<ConcursRes>> allConcurs(Long adminId) {
+        AdminDetails adminDetails = adminDetailsRepo.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("admin topilmadi!"));
+        if (adminDetails.getRole().equals("super_admin"))
+            return ResponseEntity.ok(concursRepo.findAllList());
+        else
+            return ResponseEntity.ok(concursRepo.findAllByNativeSql(adminId));
+    }
+
+    public ResponseEntity<String> updateConcursStatus(Long concursId, Boolean status) {
+        Concurs concurs = concursRepo.findById(concursId).orElseThrow(() -> new RuntimeException("concurs topilmadi!"));
+        concurs.setIsActive(status);
+        concursRepo.save(concurs);
+        return ResponseEntity.ok("Yangilandi!");
+    }
+
+    public ResponseEntity<String> deleteConcurs(Long concursId) {
+        concursRepo.deleteById(concursId);
+        return ResponseEntity.ok("O`chirildi!");
+    }
+
+    public ResponseEntity<List<ConcursName>> concursName(Long adminId) {
+        return ResponseEntity.ok(concursRepo.concursName(adminId));
+    }
+
+    public ResponseEntity<UserTotals> totals(Long adminId) {
+        long fraud = 0L;
+        long nonFraud;
+        long total;
+        List<UserDetails> usersList;
+        AdminDetails admin = adminDetailsRepo.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("admin topilmadi!"));
+        if (admin.getRole().equals("admin"))
+            usersList = userDetailsRepo.findByAdminId(adminId);
+        else
+            usersList = userDetailsRepo.findAll();
+
+        for (UserDetails userDetails : usersList) {
+            if (userDetails.getIsFraud())
+                fraud = fraud + 1;
+        }
+        total = usersList.size();
+        nonFraud = total - fraud;
+        return ResponseEntity.ok(
+                new UserTotals(total, fraud, nonFraud));
     }
 }

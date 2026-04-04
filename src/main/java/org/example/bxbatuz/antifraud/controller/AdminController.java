@@ -52,9 +52,9 @@ public class AdminController {
     @PostMapping("/create-link/{adminId}")
     public ResponseEntity<Links> createLink(
             @PathVariable(value = "adminId") Long adminId,
-            @RequestParam Integer expireTime
+            @RequestParam Long concursId
     ){
-        return adminService.createLink(adminId, expireTime);
+        return adminService.createLink(adminId, concursId);
     }
 
     @GetMapping("/list")

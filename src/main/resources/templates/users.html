@@ -1,196 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="uz">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>AntiFraud | Professional Monitoring</title>-->
-<!--    <script src="https://cdn.tailwindcss.com"></script>-->
-<!--    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">-->
-<!--    <style>-->
-<!--        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }-->
-<!--        .table-container { height: calc(100vh - 180px); overflow: auto; }-->
-<!--        th { position: sticky; top: 0; background: #f1f5f9; z-index: 10; white-space: nowrap; }-->
-<!--        td { white-space: nowrap; font-size: 13px; }-->
-<!--        .active-row { background-color: #eff6ff !important; box-shadow: inset 4px 0 0 #2563eb; }-->
-<!--        .font-mono-xs { font-family: ui-monospace, monospace; font-size: 11px; }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body class="flex min-h-screen">-->
-
-<!--<aside class="w-64 bg-slate-900 text-slate-300 flex flex-col fixed h-full z-50">-->
-<!--    <div class="p-6 border-b border-slate-800">-->
-<!--        <span class="font-bold text-white text-lg tracking-tight">AntiFraud Admin</span>-->
-<!--    </div>-->
-<!--    <nav class="flex-1 p-4 space-y-2">-->
-<!--        <a href="/form/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-800 transition-all">Dashboard</a>-->
-<!--        <a href="/form/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold shadow-lg">Foydalanuvchilar</a>-->
-<!--    </nav>-->
-<!--</aside>-->
-
-<!--<main class="ml-64 flex-1 p-6">-->
-<!--    <header class="flex justify-between items-center mb-6">-->
-<!--        <div>-->
-<!--            <h1 class="text-2xl font-extrabold text-slate-900">Tizim Foydalanuvchilari</h1>-->
-<!--            <p id="admin-info" class="text-slate-500 text-xs mt-1 font-medium italic"></p>-->
-<!--        </div>-->
-
-<!--        <div class="flex bg-slate-200/50 p-1 rounded-xl border border-slate-200">-->
-<!--            <button onclick="changeStatus(false)" id="tab-clean" class="px-5 py-2 rounded-lg text-xs font-bold transition-all">Aktiv</button>-->
-<!--            <button onclick="changeStatus(true)" id="tab-fraud" class="px-5 py-2 rounded-lg text-xs font-bold transition-all">Fraud</button>-->
-<!--        </div>-->
-<!--    </header>-->
-
-<!--    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">-->
-<!--        <div class="table-container">-->
-<!--            <table class="w-full text-left border-collapse">-->
-<!--                <thead class="text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">-->
-<!--                <tr>-->
-<!--                    <th class="px-4 py-3">ID</th>-->
-<!--                    <th class="px-4 py-3">Telefon</th>-->
-<!--                    <th class="px-4 py-3">IP Manzil</th>-->
-<!--                    <th class="px-4 py-3">Device ID</th>-->
-<!--                    <th class="px-4 py-3">Joylashuv</th>-->
-<!--                    <th class="px-4 py-3">Lat/Long</th>-->
-<!--                    <th class="px-4 py-3">IP Lat/Long</th>-->
-<!--                    <th class="px-4 py-3">Status</th>-->
-<!--                    <th class="px-4 py-3">Log Message</th>-->
-<!--                    <th class="px-4 py-3">Sana</th>-->
-<!--                </tr>-->
-<!--                </thead>-->
-<!--                <tbody id="userGrid" class="divide-y divide-slate-100">-->
-<!--                </tbody>-->
-<!--            </table>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</main>-->
-
-<!--<div id="sidePanel" class="fixed right-0 top-0 h-full w-[400px] bg-white shadow-2xl z-[60] transform translate-x-full transition-transform duration-300 border-l border-slate-200">-->
-<!--    <div class="p-6">-->
-<!--        <div class="flex justify-between items-center mb-8">-->
-<!--            <h3 class="font-bold text-lg text-slate-900">Havola Detallari</h3>-->
-<!--            <button onclick="closePanel()" class="text-slate-400 hover:text-slate-600">✕</button>-->
-<!--        </div>-->
-<!--        <div id="linkedData" class="space-y-5">-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--<script>-->
-<!--    const API_USER = '/api/user';-->
-<!--    let currentIsFraud = false;-->
-
-<!--    const getAuth = () => {-->
-<!--        const encoded = localStorage.getItem('admin_token');-->
-<!--        if (!encoded) return null;-->
-<!--        const token = atob(encoded);-->
-<!--        const payload = JSON.parse(atob(token.split('.')[1]));-->
-<!--        return { token, role: payload.role, adminId: payload.id };-->
-<!--    };-->
-
-<!--    const session = getAuth();-->
-
-<!--    async function loadData() {-->
-<!--        if (!session) return window.location.href = '/login';-->
-
-<!--        document.getElementById('admin-info').innerText = `Roli: ${session.role} | Admin ID: ${session.adminId}`;-->
-
-<!--        // Tab style-->
-<!--        const isF = currentIsFraud;-->
-<!--        document.getElementById('tab-clean').className = !isF ? 'px-5 py-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow-sm' : 'px-5 py-2 rounded-lg text-xs font-bold text-slate-500';-->
-<!--        document.getElementById('tab-fraud').className = isF ? 'px-5 py-2 rounded-lg text-xs font-bold bg-red-600 text-white shadow-sm' : 'px-5 py-2 rounded-lg text-xs font-bold text-slate-500';-->
-
-<!--        const url = (session.role === 'super_admin')-->
-<!--            ? `${API_USER}/all?isFraud=${isF}`-->
-<!--            : `${API_BASE}/list/${session.adminId}?isFraud=${isF}`;-->
-
-<!--        try {-->
-<!--            const res = await fetch(url, { headers: { 'Authorization': `Bearer ${session.token}` } });-->
-<!--            const users = await res.json();-->
-<!--            renderTable(users);-->
-<!--        } catch (err) { console.error(err); }-->
-<!--    }-->
-
-<!--    function renderTable(users) {-->
-<!--        const tbody = document.getElementById('userGrid');-->
-<!--        tbody.innerHTML = users.map(u => `-->
-<!--            <tr class="hover:bg-slate-50 transition-all cursor-pointer group" onclick="fetchLinkedProjection(${u.id}, this)">-->
-<!--                <td class="px-4 py-4 font-mono-xs text-blue-600">#${u.id}</td>-->
-<!--                <td class="px-4 py-4 font-bold text-slate-800">${u.userPhone}</td>-->
-<!--                <td class="px-4 py-4 font-mono-xs text-slate-600">${u.userIp}</td>-->
-<!--                <td class="px-4 py-4 font-mono-xs opacity-50 truncate max-w-[120px]">${u.userDeviceId}</td>-->
-<!--                <td class="px-4 py-4 text-slate-600">${u.userLocation || 'N/A'}</td>-->
-<!--                <td class="px-4 py-4 text-xs font-medium">${u.latitude}, ${u.longitude}</td>-->
-<!--                <td class="px-4 py-4 text-xs font-medium">${u.ipLatitude}, ${u.ipLongitude}</td>-->
-<!--                <td class="px-4 py-4">-->
-<!--                    <span class="px-2 py-1 rounded text-[10px] font-bold ${u.isFraud ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">-->
-<!--                        ${u.isFraud ? 'FRAUD' : 'OK'}-->
-<!--                    </span>-->
-<!--                </td>-->
-<!--                <td class="px-4 py-4 text-xs italic text-slate-400 max-w-[150px] truncate">${u.logMessage || '-'}</td>-->
-<!--                <td class="px-4 py-4 text-[11px] text-slate-500 font-medium">${new Date(u.createdAt).toLocaleString()}</td>-->
-<!--            </tr>-->
-<!--        `).join('');-->
-<!--    }-->
-
-<!--    async function fetchLinkedProjection(userId, el) {-->
-<!--        document.querySelectorAll('tr').forEach(r => r.classList.remove('active-row'));-->
-<!--        el.classList.add('active-row');-->
-
-<!--        const panel = document.getElementById('sidePanel');-->
-<!--        const content = document.getElementById('linkedData');-->
-<!--        panel.classList.remove('translate-x-full');-->
-<!--        content.innerHTML = '<div class="p-10 text-center animate-pulse text-slate-400">Projection yuklanmoqda...</div>';-->
-
-<!--        try {-->
-<!--            const res = await fetch(`${API_USER}/linked-user/${userId}`, {-->
-<!--                headers: { 'Authorization': `Bearer ${session.token}` }-->
-<!--            });-->
-<!--            const l = await res.json();-->
-
-<!--            // Interface maydonlariga moslab chiqarish (get prefiksisiz)-->
-<!--            content.innerHTML = `-->
-<!--                <div class="bg-slate-900 rounded-2xl p-5 text-white shadow-xl">-->
-<!--                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Link nomi (ID)</label>-->
-<!--                    <p class="text-2xl font-black text-blue-400">#${l.linkName}</p>-->
-<!--                    <div class="mt-4 pt-4 border-t border-slate-800 grid grid-cols-2 gap-4">-->
-<!--                        <div><label class="text-[9px] text-slate-500">USER ID</label><p class="text-sm font-bold">${l.userId}</p></div>-->
-<!--                        <div><label class="text-[9px] text-slate-500">CODE</label><p class="text-sm font-bold font-mono text-green-400">${l.code}</p></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-<!--                <div class="space-y-4">-->
-<!--                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">-->
-<!--                        <label class="text-[10px] text-slate-400 font-bold">LINK DEVICE ID</label>-->
-<!--                        <p class="font-mono-xs text-slate-700 mt-1 break-all">${l.userDeviceId}</p>-->
-<!--                    </div>-->
-
-<!--                    <div class="grid grid-cols-2 gap-4">-->
-<!--                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">-->
-<!--                            <label class="text-[10px] text-slate-400 font-bold">FRAUD STATUS</label>-->
-<!--                            <p class="text-sm font-black ${l.isFraud ? 'text-red-600' : 'text-green-600'}">${l.isFraud ? 'TRUE' : 'FALSE'}</p>-->
-<!--                        </div>-->
-<!--                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">-->
-<!--                            <label class="text-[10px] text-slate-400 font-bold">DATE</label>-->
-<!--                            <p class="text-[11px] font-bold mt-1">${new Date(l.submittedAt).toLocaleDateString()}</p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">-->
-<!--                        <label class="text-[10px] text-blue-400 font-bold">SUBMITTED TIME</label>-->
-<!--                        <p class="text-sm font-bold text-blue-900">${new Date(l.submittedAt).toLocaleTimeString()}</p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            `;-->
-<!--        } catch (err) { content.innerHTML = '<p class="text-red-500">Projection xatoligi.</p>'; }-->
-<!--    }-->
-
-<!--    function changeStatus(val) { currentIsFraud = val; loadData(); closePanel(); }-->
-<!--    function closePanel() { document.getElementById('sidePanel').classList.add('translate-x-full'); }-->
-
-<!--    window.onload = loadData;-->
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -596,7 +403,7 @@
                     <rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/>
                     <rect x="11" y="11" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/>
                 </svg>
-                Dashboard
+                Adminlar
             </a>
             <a href="/form/admin/users" class="nav-item active">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -612,6 +419,13 @@
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                 </svg>
                 Linklar
+            </a>
+            <a href="/form/admin/concurs" class="nav-item active">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="6"/>
+                    <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+                </svg>
+                Konkurslar
             </a>
             <div class="nav-divider"></div>
             <span class="nav-label">Tizim</span>
@@ -784,7 +598,7 @@
         const isSuperAdmin = auth.role === 'super_admin';
         const url = isSuperAdmin
             ? `${API_USER}/all?isFraud=${currentIsFraud}`
-            : `/api/user/list/${auth.adminId}?isFraud=${currentIsFraud}`;
+            : `${API_USER}/list/${auth.adminId}?isFraud=${currentIsFraud}`;
 
         try {
             const res = await fetch(url, { headers: headers() });

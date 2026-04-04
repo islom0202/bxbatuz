@@ -17,4 +17,11 @@ public class LinkedUsers {
     private String userCode;
     private Timestamp sentAt;
     private Timestamp clickedAt;
+    private Long concursId;
+    private String userPhone;
+    private String userDeviceId;
+    private Double latitude;
+    private Double longitude;
+    private Double ipLatitude;
+    private Double ipLongitude;
 }

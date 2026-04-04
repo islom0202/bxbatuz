@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static java.lang.Boolean.TRUE;
+import static org.example.bxbatuz.antifraud.contraints.UriEnum.BASE_URI;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,6 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
     private final AdminDetailsRepo adminDetailsRepo;
     private final AuthenticationManager authenticationManager;
-    private static final String BASE_URI = "https://seurityidentifier.linguaway.uz/form/";
 
     public ResponseEntity<String> createAdmin(SaveAdminReq req) {
         adminDetailsRepo.save(AdminDetails.builder()
@@ -59,13 +59,14 @@ public class AdminService {
                 : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("username yoki parol no`tog`ri");
     }
 
-    public ResponseEntity<Links> createLink(Long adminId, Integer expireTime) {
+    public ResponseEntity<Links> createLink(Long adminId, Long concursId) {
         String subLink = createSubLink();
         Links link = linkRepo.save(Links.builder()
                 .adminId(adminId)
-                .generatedLink(BASE_URI.concat(subLink))
+                .generatedLink(BASE_URI.getVal().concat(subLink))
                 .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusMinutes(expireTime))
+                .expiresAt(LocalDateTime.now())
+                .concursId(concursId)
                 .isExpired(false)
                 .build());
         return ResponseEntity.ok(link);
@@ -87,7 +88,7 @@ public class AdminService {
                 .stream()
                 .sorted(Comparator.comparing(AdminLinks::getCreatedAt).reversed())
                 .toList();
-        filterLinks(adminLinks);
+//        filterLinks(adminLinks);
         return ResponseEntity.ok(adminLinks);
     }
 
@@ -96,7 +97,7 @@ public class AdminService {
                 .stream()
                 .sorted(Comparator.comparing(AdminLinks::getCreatedAt).reversed())
                 .toList();
-        filterLinks(adminLinks);
+//        filterLinks(adminLinks);
         return ResponseEntity.ok(adminLinks);
     }
 

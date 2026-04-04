@@ -2,6 +2,7 @@ package org.example.bxbatuz.antifraud.service;
 import lombok.RequiredArgsConstructor;
 import org.example.bxbatuz.antifraud.dto.FormReq;
 import org.example.bxbatuz.antifraud.dto.LocationStats;
+import org.example.bxbatuz.antifraud.entity.Links;
 import org.example.bxbatuz.antifraud.entity.UserDetails;
 import org.example.bxbatuz.antifraud.repo.UserDetailsRepo;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class FraudLoggingService {
     private final UserDetailsRepo userDetailsRepo;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void logFraud(FormReq dto, String ip, String reason, LocationStats ipStats, Long  adminId) {
+    public void logFraud(FormReq dto, String ip, String reason, LocationStats ipStats, Links link) {
         UserDetails fraudUser = new UserDetails();
 
         if (userDetailsRepo.existsByUserDeviceId(dto.getDeviceId())) {
@@ -35,7 +36,7 @@ public class FraudLoggingService {
         fraudUser.setIpLatitude(ipStats.getLatitude());
         fraudUser.setIpLongitude(ipStats.getLongitude());
         fraudUser.setUserDeviceId(dto.getDeviceId());
-        fraudUser.setAdminId(adminId);
+        fraudUser.setAdminId(link.getAdminId());
         userDetailsRepo.save(fraudUser);
     }
 }

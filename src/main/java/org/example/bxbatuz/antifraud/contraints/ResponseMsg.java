@@ -12,7 +12,7 @@ public enum ResponseMsg {
     SUCCESS("Saqlandi!"),
     PHONE_ALREADY_REGISTERED("Telfon raqam mavjud!"),
     AREA_ALREADY_OCCUPIED("Bu hududdan yuborilgan!"),
-    DEVICE_DUPLICATED("Sizning ID yingiz mavjud!"),
+    DEVICE_DUPLICATED("Sizning ID yingiz bu konkursda mavjud!"),
     LOCATION_MISMATCH("Joylashuvda xatolik aniqlanda!"),
     LINK_EXPIRED("Havola yaroqsiz!");
     private final String message;

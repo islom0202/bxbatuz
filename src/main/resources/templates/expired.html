@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Havola muddati tugagan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0ede8;
+            --surface: #faf9f7;
+            --surface2: #edeae4;
+            --border: #d8d3ca;
+            --text-primary: #111110;
+            --text-secondary: #6b6660;
+            --text-muted: #a09b95;
+            --accent: #c8401a;
+            --accent-soft: rgba(200,64,26,0.08);
+            --error: #c8401a;
+            --error-soft: rgba(200,64,26,0.08);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
+            --radius-sm: 8px;
+            --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0e0e0d;
+            --surface: #181816;
+            --surface2: #222220;
+            --border: #2e2e2b;
+            --text-primary: #f0ede8;
+            --text-secondary: #8a857e;
+            --text-muted: #4a4640;
+            --accent: #e86040;
+            --accent-soft: rgba(232,96,64,0.12);
+            --error: #e86040;
+            --error-soft: rgba(232,96,64,0.12);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.6);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Atmospheric background blobs */
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(80px);
+        }
+        .bg-blob-1 {
+            top: -20%; right: -15%;
+            width: 500px; height: 500px;
+            background: radial-gradient(ellipse, var(--error-soft) 0%, transparent 70%);
+            animation: drift1 12s ease-in-out infinite alternate;
+        }
+        .bg-blob-2 {
+            bottom: -20%; left: -15%;
+            width: 420px; height: 420px;
+            background: radial-gradient(ellipse, rgba(100,80,60,0.07) 0%, transparent 70%);
+            animation: drift2 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px, 20px) scale(1.08); } }
+        @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(25px, -15px) scale(1.05); } }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 100;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 50px; padding: 6px 12px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; font-family: 'DM Sans', sans-serif;
+            color: var(--text-secondary); font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: var(--transition); letter-spacing: 0.01em;
+        }
+        .theme-toggle:hover { background: var(--surface2); color: var(--text-primary); }
+        .theme-icon { font-size: 15px; transition: transform 0.4s ease; }
+        .theme-toggle:hover .theme-icon { transform: rotate(20deg); }
+
+        /* Card */
+        .card {
+            position: relative; z-index: 1;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 24px; box-shadow: var(--shadow-lg);
+            width: 100%; max-width: 440px;
+            overflow: hidden;
+            animation: cardIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(28px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Top accent stripe — red, animated */
+        .card-stripe {
+            height: 3px;
+            background: linear-gradient(90deg, var(--error), #ff6b6b, var(--error));
+            background-size: 200% 100%;
+            animation: stripeShift 3s linear infinite;
+        }
+        @keyframes stripeShift { from { background-position: 0% 0%; } to { background-position: 200% 0%; } }
+
+        .card-body {
+            padding: 44px 40px 40px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+
+        /* Icon circle */
+        .icon-wrap {
+            position: relative;
+            width: 80px; height: 80px;
+            margin-bottom: 28px;
+        }
+        .icon-ring {
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            border: 2px solid var(--error);
+            opacity: 0.25;
+            animation: ringPulse 2.4s ease-in-out infinite;
+        }
+        .icon-ring-2 {
+            position: absolute; inset: -8px;
+            border-radius: 50%;
+            border: 1px solid var(--error);
+            opacity: 0.1;
+            animation: ringPulse 2.4s ease-in-out 0.4s infinite;
+        }
+        @keyframes ringPulse {
+            0%, 100% { transform: scale(1); opacity: 0.25; }
+            50%       { transform: scale(1.06); opacity: 0.1; }
+        }
+        .icon-circle {
+            position: relative; z-index: 1;
+            width: 80px; height: 80px; border-radius: 50%;
+            background: var(--error-soft);
+            border: 1.5px solid rgba(200,64,26,0.2);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--error);
+            animation: iconPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+        @keyframes iconPop { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+
+        /* Brand mark */
+        .brand-mark {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 24px;
+            animation: fadeUp 0.5s ease 0.15s both;
+        }
+        .brand-icon {
+            width: 30px; height: 30px; background: var(--accent);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .brand-icon::before {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+        }
+        .brand-icon svg { color: white; }
+        .brand-name {
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
+            letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);
+        }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Code badge */
+        .error-code {
+            font-family: 'Syne', sans-serif;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--error); background: var(--error-soft);
+            border: 1px solid rgba(200,64,26,0.2);
+            padding: 4px 12px; border-radius: 99px;
+            margin-bottom: 18px;
+            display: inline-flex; align-items: center; gap: 6px;
+            animation: fadeUp 0.5s ease 0.3s both;
+        }
+        .error-code-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--error); animation: blink 1.6s ease infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        /* Title */
+        .error-title {
+            font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800;
+            letter-spacing: -0.03em; color: var(--text-primary); line-height: 1.15;
+            margin-bottom: 12px;
+            animation: fadeUp 0.5s ease 0.35s both;
+        }
+
+        /* Description */
+        .error-desc {
+            font-size: 14px; color: var(--text-secondary); font-weight: 300;
+            line-height: 1.7; max-width: 320px;
+            animation: fadeUp 0.5s ease 0.42s both;
+        }
+
+        /* Divider */
+        .divider {
+            width: 100%; height: 1px; background: var(--border);
+            margin: 28px 0;
+            animation: fadeUp 0.5s ease 0.48s both;
+        }
+
+        /* Info rows */
+        .info-grid {
+            width: 100%; display: flex; flex-direction: column; gap: 10px;
+            animation: fadeUp 0.5s ease 0.52s both;
+        }
+        .info-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: var(--radius-sm);
+            background: var(--surface2); border: 1px solid var(--border);
+        }
+        .info-icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .info-text { flex: 1; text-align: left; }
+        .info-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+        .info-value { font-size: 13px; color: var(--text-primary); margin-top: 1px; font-weight: 500; }
+
+        /* Footer note */
+        .footer-note {
+            margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
+            font-size: 12px; color: var(--text-muted); line-height: 1.6;
+            width: 100%; text-align: center;
+            animation: fadeUp 0.5s ease 0.56s both;
+        }
+        .footer-note strong { color: var(--text-secondary); font-weight: 600; }
+
+        @media (max-width: 520px) {
+            body { padding: 16px; align-items: flex-start; padding-top: 60px; }
+            .card { border-radius: 18px; }
+            .card-body { padding: 32px 24px 32px; }
+            .error-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span class="theme-icon" id="themeIcon">☀️</span>
+    <span id="themeLabel">Light</span>
+</button>
+
+<div class="card">
+    <div class="card-stripe"></div>
+
+    <div class="card-body">
+
+        <!-- Brand -->
+        <div class="brand-mark">
+            <div class="brand-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+            </div>
+            <span class="brand-name">AntiFraud</span>
+        </div>
+
+        <!-- Error icon -->
+        <div class="icon-wrap">
+            <div class="icon-ring-2"></div>
+            <div class="icon-ring"></div>
+            <div class="icon-circle">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Code badge -->
+        <div class="error-code">
+            <div class="error-code-dot"></div>
+            Havola yaroqsiz
+        </div>
+
+        <!-- Title & desc -->
+        <div class="error-title">Muddati tugagan!</div>
+        <p class="error-desc">
+            Siz o'tishga urinayotgan havola allaqachon muddati o'tgan yoki bekor qilingan.
+            Yangi havola olish uchun mas'ul shaxsga murojaat qiling.
+        </p>
+
+        <div class="divider"></div>
+
+        <!-- Info rows -->
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-icon" style="background:var(--error-soft);color:var(--error);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <div class="info-text">
+                    <div class="info-label">Sabab</div>
+                    <div class="info-value">Havola vaqti tugagan yoki o'chirilgan</div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-icon" style="background:var(--accent-soft);color:var(--accent);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <div class="info-text">
+                    <div class="info-label">Keyingi qadam</div>
+                    <div class="info-value">Yangi havola so'rang</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer note -->
+        <div class="footer-note">
+            Agar bu xatolik bo'lsa, iltimos
+            <strong>mas'ul adminга</strong> murojaat qiling.<br>
+            Havola bir martalik va cheklangan vaqt uchun yaratiladi.
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Theme
+    const saved = localStorage.getItem('theme') || 'light';
+    applyTheme(saved);
+
+    function applyTheme(t) {
+        document.documentElement.setAttribute('data-theme', t);
+        document.getElementById('themeIcon').textContent  = t === 'dark' ? '🌙' : '☀️';
+        document.getElementById('themeLabel').textContent = t === 'dark' ? 'Dark' : 'Light';
+        localStorage.setItem('theme', t);
+    }
+
+    function toggleTheme() {
+        const cur = document.documentElement.getAttribute('data-theme');
+        applyTheme(cur === 'dark' ? 'light' : 'dark');
+    }
+</script>
+</body>
+</html>

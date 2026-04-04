@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 public class AdminLinks {
     private Long id;
     private String adminName;
+    private String concursName;
     private String generatedLink;
     private Timestamp createdAt;
     private Timestamp expiresAt;

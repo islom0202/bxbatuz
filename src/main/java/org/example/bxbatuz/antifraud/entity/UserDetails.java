@@ -13,8 +13,8 @@ public class UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long adminId;
-    private String userPhone;
     private String userIp;
+    private String userPhone;
     private String userDeviceId;
     private String userLocation;
     private Boolean isFraud;

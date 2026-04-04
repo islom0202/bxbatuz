@@ -19,11 +19,13 @@ public interface LinkRepo extends JpaRepository<Links, Long> {
             select
               l.id,
               a.fullname,
+              co.name as concurs_name,
               l.generated_link,
               l.created_at,
               l.expires_at,
               l.is_expired
-              from links l join admin_details a on l.admin_id = a.id""",  nativeQuery = true)
+              from links l join admin_details a on l.admin_id = a.id
+              join concurs co on co.id = l.concurs_id""", nativeQuery = true)
     List<AdminLinks> findLinksAll();
 
     Links findByGeneratedLink(String generatedLink);
@@ -32,12 +34,14 @@ public interface LinkRepo extends JpaRepository<Links, Long> {
             select
               l.id,
               a.fullname,
+              co.name as concurs_name,
               l.generated_link,
               l.created_at,
               l.expires_at,
               l.is_expired
               from links l join admin_details a on l.admin_id = a.id
-              where l.admin_id=:adminId""",  nativeQuery = true)
+              join concurs co on co.id = l.concurs_id
+              where l.admin_id=:adminId""", nativeQuery = true)
     List<AdminLinks> findLinksAllByAdminId(@Param("adminId") Long adminId);
 
     @Modifying(clearAutomatically = true)
@@ -51,6 +55,18 @@ public interface LinkRepo extends JpaRepository<Links, Long> {
     Integer countByIsExpired(Boolean isExpired);
 
     @Query(value = """
-            select count(*) from links where CURRENT_TIMESTAMP < expires_at""",  nativeQuery = true)
+            select count(*) from links where is_expired = TRUE""", nativeQuery = true)
     Integer countByIsExpired();
+
+    @Query(value = """
+        select exists (
+            select 1 from linked_users
+            where concurs_id=:concursId
+            and (user_phone=:userPhone or user_device_id=:deviceId)
+        )
+        """, nativeQuery = true)
+    boolean isExist(
+            @Param("concursId") Long concursId,
+            @Param("userPhone") String userPhone,
+            @Param("deviceId") String deviceId);
 }

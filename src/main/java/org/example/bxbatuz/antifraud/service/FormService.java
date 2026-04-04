@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.bxbatuz.antifraud.contraints.ResponseMsg;
 import org.example.bxbatuz.antifraud.dto.FormReq;
 import org.example.bxbatuz.antifraud.dto.LocationStats;
-import org.example.bxbatuz.antifraud.entity.LinkedUsers;
 import org.example.bxbatuz.antifraud.entity.Links;
 import org.example.bxbatuz.antifraud.entity.UserDetails;
 import org.example.bxbatuz.antifraud.repo.LinkRepo;
@@ -20,48 +19,36 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.InetAddress;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
+import static org.example.bxbatuz.antifraud.contraints.ResponseMsg.DEVICE_DUPLICATED;
+import static org.example.bxbatuz.antifraud.contraints.UriEnum.BASE_URI;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FormService {
     private final LinkRepo linkRepo;
-    private final LinkUsersRepo linkUsersRepo;
+    private final UserService userService;
     private final DatabaseReader databaseReader;
     private final UserDetailsRepo userDetailsRepo;
     private final FraudLoggingService fraudLoggingService;
-    private static final String BASE_URI = "https://seurityidentifier.linguaway.uz/form/";
 
     @Transactional
     public ResponseEntity<String> submitRegistration(FormReq dto, String ipAddress) {
-        Links link = getLink(BASE_URI.concat(dto.getAdminId()));
+        Links link = getLink(BASE_URI.getVal().concat(dto.getAdminId()));
         LocationStats ipStats = getIpLocation(ipAddress);
         log.info("IP Address: {}", ipAddress);
-        verifyLocationConsistency(dto, ipAddress, ipStats, link.getAdminId());
-        // 3. Save User Details
-        UserDetails user = new UserDetails();
-        user.setUserPhone(dto.getPhone());
-        user.setUserIp(ipAddress);
-        user.setLatitude(dto.getLatitude());
-        user.setLongitude(dto.getLongitude());
-        user.setIpLatitude(ipStats.getLatitude());
-        user.setIpLongitude(ipStats.getLongitude());
-        user.setUserDeviceId(dto.getDeviceId());
-        user.setIsFraud(false);
-        user.setAdminId(link.getAdminId());
-        user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        user = userDetailsRepo.save(user);
 
-        // 4. Link User to the Admin's Link
-        LinkedUsers linkRelation = new LinkedUsers();
-        linkRelation.setLinkId(link.getId());
-        linkRelation.setUserId(user.getId());
-        linkRelation.setUserCode(dto.getCode());
-        linkRelation.setSentAt(Timestamp.valueOf(LocalDateTime.now()));
-        linkRelation.setClickedAt(Timestamp.valueOf(LocalDateTime.now()));
-        linkUsersRepo.save(linkRelation);
+        UserDetails userDetail = checkIsFraudAndExist(dto);
+        if (userDetail != null && userDetail.getIsFraud()) {
+            throw new RuntimeException("Siz maxinator sifatida aniqlandingiz!");
+        }
+
+        checkCurrentLocation(dto, ipAddress, ipStats, link);
+
+        checkSameConcursAndLocationFromDb(dto, ipAddress, ipStats, link);
+
+        userService.logUserAndLink(userDetail,dto, ipAddress, ipStats, link);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseMsg.SUCCESS.getMessage());
@@ -76,11 +63,56 @@ public class FormService {
         }
     }
 
-    public void verifyLocationConsistency(FormReq dto, String ipAddress, LocationStats ipStats, Long adminId) {
+    public UserDetails checkIsFraudAndExist(FormReq dto) {
+        UserDetails user;
+        if (dto.getDeviceId() != null)
+            user = userDetailsRepo.findByUserPhoneOrUserDeviceId(dto.getPhone(), dto.getDeviceId());
+        else
+            user = userDetailsRepo.findByUserPhone(dto.getPhone());
+
+        return user;
+    }
+
+    public void checkSameConcursAndLocationFromDb(FormReq dto, String ipAddress, LocationStats ipStats, Links link) {
+
+        if (linkRepo.isExist(link.getConcursId(), dto.getPhone(), dto.getDeviceId())) {
+            throw new RuntimeException(DEVICE_DUPLICATED.getMessage());
+        }
+
+        if (userDetailsRepo.isAreaOccupied(link.getConcursId(), dto.getLatitude(), dto.getLongitude())) {
+            fraudLoggingService.logFraud(
+                    dto,
+                    ipAddress,
+                    ResponseMsg.AREA_ALREADY_OCCUPIED_LOG.getMessage(),
+                    ipStats,
+                    link);
+            throw new RuntimeException(ResponseMsg.AREA_ALREADY_OCCUPIED.getMessage());
+        }
+    }
+
+    public void checkCurrentLocation(FormReq dto, String ipAddress, LocationStats ipStats, Links link) {
         double distanceBetweenGpsAndIp = calculateDistance(dto.getLatitude(), dto.getLongitude(),
                 ipStats.getLatitude(), ipStats.getLongitude());
 
-        boolean isSuspicious = distanceBetweenGpsAndIp >= 15; // Over 10km is flagged
+        boolean isSuspicious = distanceBetweenGpsAndIp >= 15; // Over 15km is flagged
+
+        if (isSuspicious) {
+            fraudLoggingService.logFraud(
+                    dto,
+                    ipAddress,
+                    String.format(ResponseMsg.LOCATION_MISMATCH_LOG.getMessage(), distanceBetweenGpsAndIp),
+                    ipStats,
+                    link);
+
+            throw new RuntimeException(ResponseMsg.LOCATION_MISMATCH.getMessage());
+        }
+    }
+
+    public void verifyLocationConsistency(FormReq dto, String ipAddress, LocationStats ipStats, Links link) {
+        double distanceBetweenGpsAndIp = calculateDistance(dto.getLatitude(), dto.getLongitude(),
+                ipStats.getLatitude(), ipStats.getLongitude());
+
+        boolean isSuspicious = distanceBetweenGpsAndIp >= 15; // Over 15km is flagged
 
         // 2. Check for Fraud/Duplicates in DB
         if (userDetailsRepo.existsByUserPhone(dto.getPhone())) {
@@ -91,23 +123,23 @@ public class FormService {
         }
 
         if (userDetailsRepo.existsByUserDeviceId(dto.getDeviceId())) {
-            fraudLoggingService.logFraud(dto, ipAddress, ResponseMsg.DEVICE_DUPLICATED.getMessage(), ipStats, adminId);
+            fraudLoggingService.logFraud(dto, ipAddress, DEVICE_DUPLICATED.getMessage(), ipStats, link);
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    ResponseMsg.DEVICE_DUPLICATED.getMessage()
+                    DEVICE_DUPLICATED.getMessage()
             );
         }
 
-        if (userDetailsRepo.isAreaOccupied(dto.getLatitude(), dto.getLongitude())) {
-            fraudLoggingService.logFraud(dto, ipAddress, ResponseMsg.AREA_ALREADY_OCCUPIED_LOG.getMessage(), ipStats, adminId);
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    ResponseMsg.AREA_ALREADY_OCCUPIED.getMessage()
-            );
-        }
+//        if (userDetailsRepo.isAreaOccupied(dto.getLatitude(), dto.getLongitude())) {
+//            fraudLoggingService.logFraud(dto, ipAddress, ResponseMsg.AREA_ALREADY_OCCUPIED_LOG.getMessage(), ipStats, link);
+//            throw new ResponseStatusException(
+//                    HttpStatus.FORBIDDEN,
+//                    ResponseMsg.AREA_ALREADY_OCCUPIED.getMessage()
+//            );
+//        }
 
         if (isSuspicious) {
-            fraudLoggingService.logFraud(dto, ipAddress, String.format(ResponseMsg.LOCATION_MISMATCH_LOG.getMessage(), distanceBetweenGpsAndIp), ipStats, adminId);
+            fraudLoggingService.logFraud(dto, ipAddress, String.format(ResponseMsg.LOCATION_MISMATCH_LOG.getMessage(), distanceBetweenGpsAndIp), ipStats, link);
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     ResponseMsg.LOCATION_MISMATCH.getMessage()
@@ -128,7 +160,7 @@ public class FormService {
 
     private Links getLink(String fullLink) {
         Links links = linkRepo.findByGeneratedLink(fullLink);
-        if (LocalDateTime.now().isAfter(links.getExpiresAt())) {
+        if (links.getIsExpired()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     ResponseMsg.LINK_EXPIRED.getMessage()

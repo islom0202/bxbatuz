@@ -30,14 +30,14 @@ public interface LinkedUsersRepo extends JpaRepository<LinkedUsers, Long> {
             select
                           ud.id as user_id,
                           ud.user_phone,
-                          ls.generated_link as link_name,
+                          co.name as link_name,
                           lu.user_code as code,
                           ud.user_ip,
                           ud.user_device_id,
                           lu.clicked_at as submitted_at,
                           ud.is_fraud
                           from linked_users lu right join user_details ud on lu.user_id = ud.id
-                          left join links ls on ls.id = lu.link_id
+                          left join concurs co on co.id = lu.concurs_id
                           where ud.id=:userId""", nativeQuery = true)
     LinkedUsersRes findUser(@Param("userId") Long userId);
 

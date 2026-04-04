@@ -22,7 +22,6 @@ public class SubmitController {
     @ResponseBody
     public ResponseEntity<String> handleSubmit(@RequestBody FormReq form, HttpServletRequest request){
         log.debug(form.toString());
-        // 1. Get IP from Headers (Handle Proxies/Load Balancers)
         String remoteAddr = request.getHeader("X-Forwarded-For");
         if (remoteAddr == null) {
             remoteAddr = request.getRemoteAddr();

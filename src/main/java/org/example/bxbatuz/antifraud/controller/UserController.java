@@ -2,6 +2,7 @@ package org.example.bxbatuz.antifraud.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bxbatuz.antifraud.dto.LinkedUsersRes;
+import org.example.bxbatuz.antifraud.dto.UserTotals;
 import org.example.bxbatuz.antifraud.entity.UserDetails;
 import org.example.bxbatuz.antifraud.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +42,13 @@ public class UserController {
 
     @GetMapping("/linked-user/{userId}")
     public ResponseEntity<LinkedUsersRes> getLinkedUser(
-            @PathVariable(value = "userId") Long userId){
+            @PathVariable(value = "userId") Long userId) {
         return userService.getLinkedUser(userId);
     }
 
-    //todo fraud user lar va non-fraud user lar jami soni
+    @GetMapping("/totals/{adminId}")
+    public ResponseEntity<UserTotals> getAllUsersTotals(
+            @PathVariable("adminId") Long adminId) {
+        return userService.totals(adminId);
+    }
 }

@@ -6,22 +6,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Data
 @Builder
 @Entity
-@Table(name = "links")
+@Table(name = "concurs")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Links {
+public class Concurs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
+    private String description;
+    private Boolean isActive;
+    private Timestamp createdAt;
     private Long adminId;
-    private String generatedLink;
-    private LocalDateTime createdAt;
-    private LocalDateTime expiresAt;
-    private Boolean isExpired;
-    private Long concursId;
 }
