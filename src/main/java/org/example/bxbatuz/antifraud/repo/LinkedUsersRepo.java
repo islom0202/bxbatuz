@@ -12,6 +12,16 @@ import java.util.List;
 @Repository
 public interface LinkedUsersRepo extends JpaRepository<LinkedUsers, Long> {
     @Query(value = """
+    select * from linked_users
+    where concurs_id=:concursId and (user_phone=:phone or user_device_id=:userDeviceId)""", nativeQuery = true)
+    LinkedUsers findByUserPhoneOrUserDeviceId(
+            @Param("concursId") Long concursId,
+            @Param("phone") String phone,
+            @Param("userDeviceId") String userDeviceId);
+
+    LinkedUsers findByUserPhone(String userPhone);
+
+    @Query(value = """
             select
               ud.id as user_id,
               ud.user_phone,
@@ -41,4 +51,9 @@ public interface LinkedUsersRepo extends JpaRepository<LinkedUsers, Long> {
                           where ud.id=:userId""", nativeQuery = true)
     LinkedUsersRes findUser(@Param("userId") Long userId);
 
+    List<LinkedUsers> findByConcursId(Long concursId);
+
+    @Query(value = """
+            select lu.* from linked_users lu.concurs_id=:concursId """, nativeQuery = true)
+    List<LinkedUsers> findByAdminIdAndConcursId(@Param("userId") Long userId);
 }

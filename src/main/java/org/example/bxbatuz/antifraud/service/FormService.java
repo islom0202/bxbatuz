@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.bxbatuz.antifraud.contraints.ResponseMsg;
 import org.example.bxbatuz.antifraud.dto.FormReq;
 import org.example.bxbatuz.antifraud.dto.LocationStats;
+import org.example.bxbatuz.antifraud.entity.LinkedUsers;
 import org.example.bxbatuz.antifraud.entity.Links;
-import org.example.bxbatuz.antifraud.entity.UserDetails;
 import org.example.bxbatuz.antifraud.repo.LinkRepo;
-import org.example.bxbatuz.antifraud.repo.LinkUsersRepo;
+import org.example.bxbatuz.antifraud.repo.LinkedUsersRepo;
 import org.example.bxbatuz.antifraud.repo.UserDetailsRepo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +30,7 @@ public class FormService {
     private final LinkRepo linkRepo;
     private final UserService userService;
     private final DatabaseReader databaseReader;
+    private final LinkedUsersRepo linkedUsersRepo;
     private final UserDetailsRepo userDetailsRepo;
     private final FraudLoggingService fraudLoggingService;
 
@@ -39,16 +40,16 @@ public class FormService {
         LocationStats ipStats = getIpLocation(ipAddress);
         log.info("IP Address: {}", ipAddress);
 
-        UserDetails userDetail = checkIsFraudAndExist(dto);
-        if (userDetail != null && userDetail.getIsFraud()) {
+        LinkedUsers linkedUser = checkIsFraudAndExist(dto, link);
+        if (linkedUser != null && linkedUser.getIsFraud()) {
             throw new RuntimeException("Siz maxinator sifatida aniqlandingiz!");
         }
 
-        checkCurrentLocation(dto, ipAddress, ipStats, link);
+        checkCurrentLocation(dto, ipAddress, ipStats, link, linkedUser);
 
-        checkSameConcursAndLocationFromDb(dto, ipAddress, ipStats, link);
+        checkSameConcursAndLocationFromDb(dto, ipAddress, ipStats, link, linkedUser);
 
-        userService.logUserAndLink(userDetail,dto, ipAddress, ipStats, link);
+        userService.logUserAndLink(linkedUser, dto, ipAddress, ipStats, link, linkedUser);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseMsg.SUCCESS.getMessage());
@@ -63,38 +64,49 @@ public class FormService {
         }
     }
 
-    public UserDetails checkIsFraudAndExist(FormReq dto) {
-        UserDetails user;
+    public LinkedUsers checkIsFraudAndExist(FormReq dto, Links link) {
+        LinkedUsers user;
         if (dto.getDeviceId() != null)
-            user = userDetailsRepo.findByUserPhoneOrUserDeviceId(dto.getPhone(), dto.getDeviceId());
+            user = linkedUsersRepo.findByUserPhoneOrUserDeviceId(
+                    link.getConcursId(), dto.getPhone(), dto.getDeviceId());
         else
-            user = userDetailsRepo.findByUserPhone(dto.getPhone());
-
+            user = linkedUsersRepo.findByUserPhone(dto.getPhone());
         return user;
     }
 
-    public void checkSameConcursAndLocationFromDb(FormReq dto, String ipAddress, LocationStats ipStats, Links link) {
+    public void checkSameConcursAndLocationFromDb(
+            FormReq dto, String ipAddress, LocationStats ipStats, Links link, LinkedUsers linkedUser) {
 
         if (linkRepo.isExist(link.getConcursId(), dto.getPhone(), dto.getDeviceId())) {
+            fraudLoggingService.logFraud(
+                    dto,
+                    ipAddress,
+                    ResponseMsg.DEVICE_DUPLICATED_LOG.getMessage(),
+                    ipStats,
+                    link,
+                    linkedUser);
             throw new RuntimeException(DEVICE_DUPLICATED.getMessage());
         }
 
         if (userDetailsRepo.isAreaOccupied(link.getConcursId(), dto.getLatitude(), dto.getLongitude())) {
+            System.out.println("isAreaOccupied: " + dto.getPhone());
             fraudLoggingService.logFraud(
                     dto,
                     ipAddress,
                     ResponseMsg.AREA_ALREADY_OCCUPIED_LOG.getMessage(),
                     ipStats,
-                    link);
+                    link,
+                    linkedUser);
             throw new RuntimeException(ResponseMsg.AREA_ALREADY_OCCUPIED.getMessage());
         }
     }
 
-    public void checkCurrentLocation(FormReq dto, String ipAddress, LocationStats ipStats, Links link) {
+    public void checkCurrentLocation(
+            FormReq dto, String ipAddress, LocationStats ipStats, Links link, LinkedUsers linkedUser) {
         double distanceBetweenGpsAndIp = calculateDistance(dto.getLatitude(), dto.getLongitude(),
                 ipStats.getLatitude(), ipStats.getLongitude());
-
-        boolean isSuspicious = distanceBetweenGpsAndIp >= 15; // Over 15km is flagged
+        System.out.println("distanceBetweenGpsAndIp: " + distanceBetweenGpsAndIp + "username: " +  dto.getPhone());
+        boolean isSuspicious = distanceBetweenGpsAndIp >= 400; // Over 400km is flagged
 
         if (isSuspicious) {
             fraudLoggingService.logFraud(
@@ -102,48 +114,10 @@ public class FormService {
                     ipAddress,
                     String.format(ResponseMsg.LOCATION_MISMATCH_LOG.getMessage(), distanceBetweenGpsAndIp),
                     ipStats,
-                    link);
+                    link,
+                    linkedUser);
 
             throw new RuntimeException(ResponseMsg.LOCATION_MISMATCH.getMessage());
-        }
-    }
-
-    public void verifyLocationConsistency(FormReq dto, String ipAddress, LocationStats ipStats, Links link) {
-        double distanceBetweenGpsAndIp = calculateDistance(dto.getLatitude(), dto.getLongitude(),
-                ipStats.getLatitude(), ipStats.getLongitude());
-
-        boolean isSuspicious = distanceBetweenGpsAndIp >= 15; // Over 15km is flagged
-
-        // 2. Check for Fraud/Duplicates in DB
-        if (userDetailsRepo.existsByUserPhone(dto.getPhone())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    ResponseMsg.PHONE_ALREADY_REGISTERED.getMessage()
-            );
-        }
-
-        if (userDetailsRepo.existsByUserDeviceId(dto.getDeviceId())) {
-            fraudLoggingService.logFraud(dto, ipAddress, DEVICE_DUPLICATED.getMessage(), ipStats, link);
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    DEVICE_DUPLICATED.getMessage()
-            );
-        }
-
-//        if (userDetailsRepo.isAreaOccupied(dto.getLatitude(), dto.getLongitude())) {
-//            fraudLoggingService.logFraud(dto, ipAddress, ResponseMsg.AREA_ALREADY_OCCUPIED_LOG.getMessage(), ipStats, link);
-//            throw new ResponseStatusException(
-//                    HttpStatus.FORBIDDEN,
-//                    ResponseMsg.AREA_ALREADY_OCCUPIED.getMessage()
-//            );
-//        }
-
-        if (isSuspicious) {
-            fraudLoggingService.logFraud(dto, ipAddress, String.format(ResponseMsg.LOCATION_MISMATCH_LOG.getMessage(), distanceBetweenGpsAndIp), ipStats, link);
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    ResponseMsg.LOCATION_MISMATCH.getMessage()
-            );
         }
     }
 

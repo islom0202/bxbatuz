@@ -20,6 +20,7 @@ public class LinkedUsers {
     private Long concursId;
     private String userPhone;
     private String userDeviceId;
+    private Boolean isFraud;
     private Double latitude;
     private Double longitude;
     private Double ipLatitude;

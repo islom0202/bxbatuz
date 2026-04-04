@@ -685,12 +685,12 @@
         <!-- Nav -->
         <nav>
             <span class="nav-label">Asosiy</span>
-            <a href="#" class="nav-item active">
+            <a href="#" class="nav-item active" id="nav-dashboard">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/>
                     <rect x="11" y="11" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/>
                 </svg>
-                Adminlar
+                Bosh sahifa
             </a>
             <a href="/form/admin/users" class="nav-item">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -918,9 +918,17 @@
         document.getElementById('sidebar-phone').textContent = auth.phone || '';
         document.getElementById('stat-role').textContent = auth.role?.replace('_', ' ');
 
-        if (isSuperAdmin) {
-            document.getElementById('btn-create-admin').classList.remove('hidden');
-        }
+        if (!isSuperAdmin) {
+        document.getElementById('nav-dashboard').classList.add('hidden');
+        window.location.href = '/form/admin/users';
+    } else {
+        document.getElementById('btn-create-admin').classList.remove('hidden');
+    }
+
+
+<!--        if (isSuperAdmin) {-->
+<!--            document.getElementById('btn-create-admin').classList.remove('hidden');-->
+<!--        }-->
     }
 
     // ── Load Data ──

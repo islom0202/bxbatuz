@@ -24,6 +24,10 @@ public interface ConcursRepo extends JpaRepository<Concurs,Long> {
     List<ConcursRes> findAllList();
 
     @Query(value = """
-            select id, name from concurs where admin_id=:adminId""", nativeQuery = true)
+            select id, name from concurs where admin_id=:adminId and is_active = TRUE""", nativeQuery = true)
     List<ConcursName> concursName(@Param("adminId") Long adminId);
+
+    @Query(value = """
+            select id, name from concurs where is_active = TRUE""", nativeQuery = true)
+    List<ConcursName> concursAllName();
 }

@@ -159,8 +159,46 @@
 
         /* ─── HEADER ─── */
         .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+        .page-header-left { display: flex; flex-direction: column; gap: 0; }
         .page-title { font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; line-height: 1; }
         .page-subtitle { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.5px; }
+
+        .page-header-right {
+            display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+        }
+
+        /* ─── DOWNLOAD BUTTON ─── */
+        .btn-download {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 18px;
+            background: var(--green-dim);
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: var(--radius-md);
+            color: var(--green);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-download::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), transparent);
+            opacity: 0; transition: opacity 0.18s ease;
+        }
+        .btn-download:hover {
+            background: rgba(16,185,129,0.18);
+            border-color: rgba(16,185,129,0.4);
+            box-shadow: 0 0 18px rgba(16,185,129,0.15), 0 4px 12px rgba(0,0,0,0.3);
+            transform: translateY(-1px);
+        }
+        .btn-download:hover::before { opacity: 1; }
+        .btn-download:active { transform: translateY(0); }
+        .btn-download svg { flex-shrink: 0; }
 
         /* ─── TAB TOGGLE ─── */
         .tab-group {
@@ -371,6 +409,206 @@
         #toast.success { border-left: 3px solid var(--green); }
         #toast.error   { border-left: 3px solid var(--red); }
 
+        /* ─── DOWNLOAD MODAL ─── */
+        .modal-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(10, 13, 20, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.22s ease;
+        }
+        .modal-backdrop.open {
+            opacity: 1; pointer-events: all;
+        }
+
+        .modal {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            width: 100%; max-width: 400px;
+            padding: 0;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.06);
+            transform: scale(0.94) translateY(12px);
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s ease;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .modal-backdrop.open .modal {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .modal-top-bar {
+            height: 3px;
+            background: linear-gradient(90deg, var(--green), var(--cyan), var(--accent));
+        }
+
+        .modal-header {
+            padding: 20px 22px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+        }
+        .modal-header-icon {
+            width: 40px; height: 40px; border-radius: var(--radius-md);
+            background: var(--green-dim);
+            border: 1px solid rgba(16,185,129,0.2);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--green); flex-shrink: 0;
+        }
+        .modal-header-text { flex: 1; min-width: 0; }
+        .modal-title { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+        .modal-desc {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px; color: var(--text-muted);
+            margin-top: 4px; letter-spacing: 0.5px;
+        }
+        .modal-x {
+            width: 28px; height: 28px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-muted);
+            transition: all 0.15s; flex-shrink: 0;
+        }
+        .modal-x:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        .modal-body { padding: 20px 22px; }
+
+        .select-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--text-muted); margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .select-label::before {
+            content: ''; width: 5px; height: 5px;
+            border-radius: 50%; background: var(--green);
+        }
+
+        /* Concurs list as selectable cards */
+        .concurs-list {
+            display: flex; flex-direction: column; gap: 6px;
+            max-height: 240px; overflow-y: auto;
+            padding-right: 2px;
+        }
+        .concurs-list::-webkit-scrollbar { width: 3px; }
+        .concurs-list::-webkit-scrollbar-thumb { background: var(--border-light); }
+
+        .concurs-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        .concurs-option:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-light);
+        }
+        .concurs-option.selected {
+            background: rgba(16,185,129,0.08);
+            border-color: rgba(16,185,129,0.35);
+            box-shadow: inset 3px 0 0 var(--green);
+        }
+
+        .concurs-radio {
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 2px solid var(--border-light);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.15s ease;
+        }
+        .concurs-option.selected .concurs-radio {
+            border-color: var(--green);
+            background: var(--green-dim);
+        }
+        .concurs-radio-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green);
+            opacity: 0; transform: scale(0);
+            transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .concurs-option.selected .concurs-radio-dot { opacity: 1; transform: scale(1); }
+
+        .concurs-name {
+            font-size: 13px; font-weight: 600; color: var(--text-primary);
+            flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .concurs-id-tag {
+            font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+            color: var(--text-muted); background: var(--bg-base);
+            border: 1px solid var(--border); border-radius: 99px;
+            padding: 2px 7px; flex-shrink: 0;
+        }
+
+        .concurs-loading {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; padding: 28px;
+            color: var(--text-muted);
+            font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+        }
+        .concurs-empty {
+            text-align: center; padding: 28px;
+            color: var(--text-muted);
+            font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+        }
+
+        .modal-footer {
+            padding: 16px 22px 20px;
+            border-top: 1px solid var(--border);
+            display: flex; gap: 10px; justify-content: flex-end;
+        }
+        .btn-cancel {
+            padding: 9px 18px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.15s ease;
+        }
+        .btn-cancel:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        .btn-confirm {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 20px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1));
+            border: 1px solid rgba(16,185,129,0.35);
+            border-radius: var(--radius-md);
+            color: var(--green);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.18s ease;
+        }
+        .btn-confirm:hover:not(:disabled) {
+            background: rgba(16,185,129,0.22);
+            border-color: rgba(16,185,129,0.5);
+            box-shadow: 0 4px 16px rgba(16,185,129,0.15);
+            transform: translateY(-1px);
+        }
+        .btn-confirm:disabled {
+            opacity: 0.4; cursor: not-allowed;
+        }
+        .btn-confirm.loading .btn-confirm-text { display: none; }
+        .btn-confirm .btn-confirm-spinner {
+            display: none;
+            width: 14px; height: 14px;
+            border: 2px solid rgba(16,185,129,0.3);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .btn-confirm.loading .btn-confirm-spinner { display: block; }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -398,12 +636,12 @@
 
         <nav>
             <span class="nav-label">Asosiy</span>
-            <a href="/form/admin/dashboard" class="nav-item">
+            <a href="/form/admin/dashboard" class="nav-item" id="nav-dashboard">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/>
                     <rect x="11" y="11" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/>
                 </svg>
-                Adminlar
+                Bosh sahifa
             </a>
             <a href="/form/admin/users" class="nav-item active">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -446,17 +684,29 @@
     <div class="page-content">
 
         <div class="page-header">
-            <div>
+            <div class="page-header-left">
                 <h1 class="page-title">Foydalanuvchilar</h1>
                 <p class="page-subtitle" id="page-subtitle">// tizimga kirgan barcha foydalanuvchilar</p>
             </div>
-            <div class="tab-group">
-                <button class="tab-btn active-tab" id="tab-aktiv" onclick="changeStatus(false)">
-                    <span class="dot"></span> Aktiv
+            <div class="page-header-right">
+                <!-- ── DOWNLOAD BUTTON ── -->
+                <button class="btn-download" onclick="openDownloadModal()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Yuklab olish
                 </button>
-                <button class="tab-btn fraud-tab" id="tab-fraud" onclick="changeStatus(true)">
-                    <span class="dot"></span> Fraud
-                </button>
+
+                <div class="tab-group">
+                    <button class="tab-btn active-tab" id="tab-aktiv" onclick="changeStatus(false)">
+                        <span class="dot"></span> Aktiv
+                    </button>
+                    <button class="tab-btn fraud-tab" id="tab-fraud" onclick="changeStatus(true)">
+                        <span class="dot"></span> Fraud
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -553,11 +803,61 @@
     </div>
 </div>
 
+<!-- ─── DOWNLOAD MODAL ─── -->
+<div class="modal-backdrop" id="downloadModal" onclick="handleModalBackdropClick(event)">
+    <div class="modal" id="modalBox">
+        <div class="modal-top-bar"></div>
+        <div class="modal-header">
+            <div class="modal-header-icon">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </div>
+            <div class="modal-header-text">
+                <div class="modal-title">Excel Hisobot Yuklab Olish</div>
+                <div class="modal-desc">// konkursni tanlang · fraud_report.xlsx</div>
+            </div>
+            <button class="modal-x" onclick="closeDownloadModal()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="1" y1="1" x2="12" y2="12"/><line x1="12" y1="1" x2="1" y2="12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="select-label">Konkursni tanlang</div>
+            <div class="concurs-list" id="concursList">
+                <div class="concurs-loading">
+                    <div class="spin" style="width:18px;height:18px;border-width:2px;border-top-color:var(--green);"></div>
+                    <span>Yuklanmoqda...</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDownloadModal()">Bekor qilish</button>
+            <button class="btn-confirm" id="btn-confirm-dl" onclick="downloadReport()" disabled>
+                <div class="btn-confirm-spinner"></div>
+                <span class="btn-confirm-text" style="display:flex;align-items:center;gap:7px;">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Yuklab olish
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
     const API_USER = '/api/user';
+    const API_REPORT = '/api/report';
     let currentIsFraud = false;
+    let selectedConcursId = null;
 
     // ── Auth ──
     const getAuth = () => {
@@ -605,12 +905,6 @@
             if (res.status === 401 || res.status === 403) return logout();
             const users = await res.json();
             renderTable(users);
-
-            const fraudCount = users.filter(u => u.isFraud).length;
-            const safeCount = users.length - fraudCount;
-            document.getElementById('stat-showing').textContent = users.length;
-            document.getElementById('stat-fraud-count').textContent = fraudCount;
-            document.getElementById('stat-safe-count').textContent = safeCount;
             document.getElementById('tbl-count').textContent = `${users.length} ta`;
         } catch (e) {
             showToast('Ma\'lumot yuklanmadi', 'error');
@@ -663,17 +957,13 @@
 
             content.innerHTML = `
                 <div class="panel-card" style="border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.06);">
-                    <div class="panel-card-header">Link Identifikatori</div>
+                    <div class="panel-card-header">Konkurs nomi</div>
                     <div class="panel-link-id">#${l.linkName}</div>
                 </div>
 
                 <div class="panel-grid">
                     <div class="panel-card">
-                        <div class="field-label">User ID</div>
-                        <div class="field-value mono" style="color:var(--cyan)">${l.userId}</div>
-                    </div>
-                    <div class="panel-card">
-                        <div class="field-label">Code</div>
+                        <div class="field-label">Kod</div>
                         <div class="field-value mono" style="color:var(--green)">${l.code}</div>
                     </div>
                 </div>
@@ -728,12 +1018,124 @@
         loadData();
     }
 
+    // ── DOWNLOAD MODAL ──
+    async function openDownloadModal() {
+        selectedConcursId = null;
+        document.getElementById('btn-confirm-dl').disabled = true;
+        document.getElementById('downloadModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        const list = document.getElementById('concursList');
+        list.innerHTML = `<div class="concurs-loading">
+            <div class="spin" style="width:18px;height:18px;border-width:2px;border-top-color:var(--green);"></div>
+            <span>Yuklanmoqda...</span>
+        </div>`;
+
+        try {
+            const res = await fetch(`/api/user/names/${auth.adminId}`, { headers: headers() });
+            if (!res.ok) throw new Error();
+            const concurses = await res.json();
+
+            if (!concurses.length) {
+                list.innerHTML = `<div class="concurs-empty">// konkurslar topilmadi</div>`;
+                return;
+            }
+
+            list.innerHTML = concurses.map(c => `
+                <div class="concurs-option" onclick="selectConcurs(${c.id}, this)" data-id="${c.id}">
+                    <div class="concurs-radio">
+                        <div class="concurs-radio-dot"></div>
+                    </div>
+                    <span class="concurs-name">${c.name}</span>
+                    <span class="concurs-id-tag">#${c.id}</span>
+                </div>
+            `).join('');
+        } catch {
+            list.innerHTML = `<div class="concurs-empty" style="color:var(--red);">// yuklab bo'lmadi</div>`;
+        }
+    }
+
+    function selectConcurs(id, el) {
+        document.querySelectorAll('.concurs-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedConcursId = id;
+        document.getElementById('btn-confirm-dl').disabled = false;
+    }
+
+    function closeDownloadModal() {
+        document.getElementById('downloadModal').classList.remove('open');
+        document.body.style.overflow = '';
+        selectedConcursId = null;
+        const btn = document.getElementById('btn-confirm-dl');
+        btn.disabled = true;
+        btn.classList.remove('loading');
+    }
+
+    function handleModalBackdropClick(e) {
+        if (e.target === document.getElementById('downloadModal')) {
+            closeDownloadModal();
+        }
+    }
+
+    async function downloadReport() {
+        if (!selectedConcursId) return;
+
+        const btn = document.getElementById('btn-confirm-dl');
+        btn.disabled = true;
+        btn.classList.add('loading');
+
+        try {
+            const res = await fetch(
+                `${API_REPORT}/fraud-excel/${auth.adminId}/${selectedConcursId}`,
+                { headers: headers() }
+            );
+
+            if (!res.ok) throw new Error('Server xatosi');
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fraud_report_concurs_${selectedConcursId}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+
+            closeDownloadModal();
+            showToast('Hisobot muvaffaqiyatli yuklandi', 'success');
+        } catch (e) {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            showToast('Yuklab bo\'lmadi: ' + e.message, 'error');
+        }
+    }
+
+    // ── Keyboard close ──
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeDownloadModal();
+    });
+
     function logout() {
         localStorage.removeItem('admin_token');
         window.location.href = '/form/admin/login';
     }
 
-    window.addEventListener('load', () => { initUI(); loadData(); });
+    // ── Load Totals ──
+    async function loadTotals() {
+        try {
+            const res = await fetch(`${API_USER}/totals/${auth.adminId}`, { headers: headers() });
+            if (!res.ok) throw new Error();
+            const t = await res.json();
+            document.getElementById('stat-showing').textContent  = t.total    ?? '—';
+            document.getElementById('stat-fraud-count').textContent = t.fraud ?? '—';
+            document.getElementById('stat-safe-count').textContent  = t.nonFraud ?? '—';
+        } catch {
+            // silently leave the em-dashes; table still works
+        }
+    }
+
+    window.addEventListener('load', () => { initUI(); loadData(); loadTotals(); });
 </script>
 </body>
 </html>

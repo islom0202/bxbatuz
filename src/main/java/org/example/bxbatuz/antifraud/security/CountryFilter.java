@@ -2,6 +2,7 @@ package org.example.bxbatuz.antifraud.security;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,7 +36,6 @@ public class CountryFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access restricted to Uzbekistan.");
                 return;
             }
-            System.out.println("filter -> " + country.getCountry().getIsoCode());
         } catch (Exception e) {
         }
 

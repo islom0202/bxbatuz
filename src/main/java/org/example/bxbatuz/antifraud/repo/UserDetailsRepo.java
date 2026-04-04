@@ -13,7 +13,6 @@ public interface UserDetailsRepo extends JpaRepository<UserDetails, Long> {
     List<UserDetails> findByIsFraud(Boolean isFraud);
 
     boolean existsByUserPhone(String phone);
-    UserDetails findByUserPhoneOrUserDeviceId(String phone,  String userDeviceId);
     UserDetails findByUserPhone(String phone);
 
     @Query(value = """

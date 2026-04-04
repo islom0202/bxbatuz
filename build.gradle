@@ -18,6 +18,8 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.apache.poi:poi:5.2.5'
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:4.0.3")
     implementation 'com.maxmind.geoip2:geoip2:4.2.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

@@ -13,7 +13,8 @@ public enum ResponseMsg {
     PHONE_ALREADY_REGISTERED("Telfon raqam mavjud!"),
     AREA_ALREADY_OCCUPIED("Bu hududdan yuborilgan!"),
     DEVICE_DUPLICATED("Sizning ID yingiz bu konkursda mavjud!"),
-    LOCATION_MISMATCH("Joylashuvda xatolik aniqlanda!"),
+    DEVICE_DUPLICATED_LOG("Ko`plab qurilmadan yuborish holati mavjud!"),
+    LOCATION_MISMATCH("Joylashuvda xatolik aniqlandi!"),
     LINK_EXPIRED("Havola yaroqsiz!");
     private final String message;
 }

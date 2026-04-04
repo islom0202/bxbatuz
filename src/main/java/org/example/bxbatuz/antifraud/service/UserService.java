@@ -24,11 +24,11 @@ public class UserService {
 
     @Transactional
     public void logUserAndLink(
-            UserDetails userDetail,
+            LinkedUsers userDetail,
             FormReq dto,
             String ipAddress,
             LocationStats ipStats,
-            Links link){
+            Links link, LinkedUsers linkedUser){
         Long userId;
         if (userDetail == null){
             UserDetails user = new UserDetails();
@@ -54,7 +54,9 @@ public class UserService {
         linkRelation.setUserCode(dto.getCode());
         linkRelation.setSentAt(Timestamp.valueOf(LocalDateTime.now()));
         linkRelation.setClickedAt(Timestamp.valueOf(LocalDateTime.now()));
-        linkRelation.setUserCode(dto.getPhone());
+        linkRelation.setUserCode(dto.getCode());
+        linkRelation.setIsFraud(false);
+        linkRelation.setUserPhone(dto.getPhone());
         linkRelation.setUserDeviceId(dto.getDeviceId());
         linkRelation.setConcursId(link.getConcursId());
         linkRelation.setLatitude(dto.getLatitude());
@@ -142,6 +144,10 @@ public class UserService {
     }
 
     public ResponseEntity<List<ConcursName>> concursName(Long adminId) {
+        AdminDetails adminDetails = adminDetailsRepo.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("admin topilmadi!"));
+        if (adminDetails.getRole().equals("super_admin"))
+            return ResponseEntity.ok(concursRepo.concursAllName());
         return ResponseEntity.ok(concursRepo.concursName(adminId));
     }
 
