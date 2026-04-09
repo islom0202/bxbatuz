@@ -195,21 +195,20 @@ public class UserService {
             else {
                 linkedUsers = linkedUsersRepo.findByUserCode(key);
                 list = linkedUsers.stream().map(LinkedUsers::getUserPhone).toList();
+                userDetailsList = userDetailsRepo.findByUserPhone(list);
+            }
+        }
+        else {
+            if (searchField.equals("phone"))
+                userDetailsList = userDetailsRepo.findByUserPhoneAll(key, adminId);
+            else {
+                linkedUsers = linkedUsersRepo.findByUserCode(key);
+                list = linkedUsers.stream().map(LinkedUsers::getUserPhone).toList();
                 List<UserDetails> byUserPhone = userDetailsRepo.findByUserPhone(list);
                 userDetailsList = byUserPhone.stream()
                         .filter(v -> v.getAdminId().equals(adminId))
                         .toList();
             }
-        }
-        else if (searchField.equals("phone"))
-            userDetailsList = userDetailsRepo.findByUserPhoneAll(key, adminId);
-        else {
-            linkedUsers = linkedUsersRepo.findByUserCode(key);
-            list = linkedUsers.stream().map(LinkedUsers::getUserPhone).toList();
-            List<UserDetails> byUserPhone = userDetailsRepo.findByUserPhone(list);
-            userDetailsList = byUserPhone.stream()
-                    .filter(v -> v.getAdminId().equals(adminId))
-                    .toList();
         }
         return ResponseEntity.ok(userDetailsList);
     }
