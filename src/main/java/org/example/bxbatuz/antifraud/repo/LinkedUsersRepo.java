@@ -37,16 +37,12 @@ public interface LinkedUsersRepo extends JpaRepository<LinkedUsers, Long> {
     LinkedUsers findByUserId(Long userId);
 
     @Query(value = """
-            select
-                          ud.id as user_id,
-                          ud.user_phone,
+                     select
                           co.name as link_name,
                           lu.user_code as code,
-                          ud.user_ip,
                           ud.user_device_id,
-                          lu.clicked_at as submitted_at,
-                          ud.is_fraud
-                          from linked_users lu right join user_details ud on lu.user_id = ud.id
+                          lu.clicked_at as submitted_at
+                          from linked_users lu left join user_details ud on lu.user_id = ud.id
                           left join concurs co on co.id = lu.concurs_id
                           where ud.id=:userId""", nativeQuery = true)
     LinkedUsersRes findUser(@Param("userId") Long userId);
@@ -56,4 +52,6 @@ public interface LinkedUsersRepo extends JpaRepository<LinkedUsers, Long> {
     @Query(value = """
             select lu.* from linked_users lu.concurs_id=:concursId """, nativeQuery = true)
     List<LinkedUsers> findByAdminIdAndConcursId(@Param("userId") Long userId);
+
+    LinkedUsers findByUserCode(String userCode);
 }

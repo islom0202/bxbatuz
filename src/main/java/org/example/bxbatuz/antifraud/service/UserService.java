@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.bxbatuz.antifraud.dto.*;
 import org.example.bxbatuz.antifraud.entity.*;
 import org.example.bxbatuz.antifraud.repo.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +32,9 @@ public class UserService {
             FormReq dto,
             String ipAddress,
             LocationStats ipStats,
-            Links link, LinkedUsers linkedUser){
+            Links link, LinkedUsers linkedUser) {
         Long userId;
-        if (userDetail == null){
+        if (userDetail == null) {
             UserDetails user = new UserDetails();
             user.setUserPhone(dto.getPhone());
             user.setUserIp(ipAddress);
@@ -44,8 +48,7 @@ public class UserService {
             user.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
             user = userDetailsRepo.save(user);
             userId = user.getId();
-        }
-        else userId = userDetail.getId();
+        } else userId = userDetail.getId();
 
         // 4. Link User to the Admin's Link
         LinkedUsers linkRelation = new LinkedUsers();
@@ -66,10 +69,11 @@ public class UserService {
         linkedUsersRepo.save(linkRelation);
     }
 
-    public ResponseEntity<List<UserDetails>> all(Boolean isFraud) {
+    public ResponseEntity<Page<UserDetails>> all(Boolean isFraud, int page) {
+        Pageable pageable = PageRequest.of(page, 25, Sort.by(Sort.Direction.DESC, "createdAt"));
         return isFraud == null
-                ? ResponseEntity.ok(userDetailsRepo.findAll())
-                : ResponseEntity.ok(userDetailsRepo.findByIsFraud(isFraud));
+                ? ResponseEntity.ok(userDetailsRepo.findAll(pageable))
+                : ResponseEntity.ok(userDetailsRepo.findByIsFraud(isFraud, pageable));
     }
 
     public ResponseEntity<UserDetails> byUserId(Long userId) {
@@ -86,8 +90,9 @@ public class UserService {
         return ResponseEntity.ok(linkedUsersRepo.findUser(userId));
     }
 
-    public ResponseEntity<List<UserDetails>> byAdminId(Boolean isFraud, Long adminId) {
-        return ResponseEntity.ok(userDetailsRepo.findByAdminIdAndIsFraud(adminId, isFraud));
+    public ResponseEntity<Page<UserDetails>> byAdminId(Boolean isFraud, Long adminId, int page) {
+        Pageable pageable = PageRequest.of(page, 25, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(userDetailsRepo.findByAdminIdAndIsFraud(adminId, isFraud, pageable));
     }
 
     public ResponseEntity<List<AdminLinks>> allLinksAdminId(Long adminId) {
@@ -171,5 +176,18 @@ public class UserService {
         nonFraud = total - fraud;
         return ResponseEntity.ok(
                 new UserTotals(total, fraud, nonFraud));
+    }
+
+    public ResponseEntity<List<UserDetails>> search(
+            Long adminId, String key, String searchField) {
+        List<UserDetails> userDetailsList;
+        if (searchField.equals("phone"))
+            userDetailsList = userDetailsRepo.findByUserPhoneAll(key, adminId);
+        else {
+            LinkedUsers linkedUser = linkedUsersRepo.findByUserCode(key);
+            UserDetails byUserPhone = userDetailsRepo.findByUserPhone(linkedUser.getUserPhone());
+            userDetailsList = byUserPhone.getAdminId().equals(adminId) ? List.of(byUserPhone) : List.of();
+        }
+        return ResponseEntity.ok(userDetailsList);
     }
 }

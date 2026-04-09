@@ -247,6 +247,136 @@
         .mini-stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); }
         .mini-stat-value { font-size: 20px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; line-height: 1.1; margin-top: 2px; }
 
+        /* ─── SEARCH BAR ─── */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 10px 14px;
+            transition: border-color 0.18s;
+        }
+        .search-bar:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        .search-bar-icon {
+            color: var(--text-muted);
+            flex-shrink: 0;
+            display: flex; align-items: center;
+        }
+        .search-field-select {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 6px 10px;
+            cursor: pointer;
+            outline: none;
+            flex-shrink: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: all 0.15s ease;
+            min-width: 90px;
+        }
+        .search-field-select:focus {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .search-field-select option { background: var(--bg-elevated); }
+
+        .search-divider {
+            width: 1px; height: 20px;
+            background: var(--border-light);
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none; outline: none;
+            color: var(--text-primary);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+            caret-color: var(--accent);
+        }
+        .search-input::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .search-clear-btn {
+            background: none; border: none;
+            color: var(--text-muted);
+            cursor: pointer; padding: 2px;
+            display: flex; align-items: center;
+            border-radius: 4px;
+            transition: color 0.15s;
+            flex-shrink: 0;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.15s, color 0.15s;
+        }
+        .search-clear-btn.visible {
+            opacity: 1; pointer-events: all;
+        }
+        .search-clear-btn:hover { color: var(--text-primary); }
+
+        .search-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 7px 16px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(59,130,246,0.25);
+            border-radius: var(--radius-sm);
+            color: var(--accent);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .search-btn:hover {
+            background: rgba(59,130,246,0.18);
+            border-color: rgba(59,130,246,0.4);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+        }
+        .search-btn:active { transform: scale(0.98); }
+        .search-btn.loading {
+            opacity: 0.6; cursor: not-allowed; pointer-events: none;
+        }
+
+        /* Search mode indicator */
+        .search-mode-banner {
+            display: none;
+            align-items: center; gap: 10px;
+            padding: 8px 14px;
+            margin-bottom: 10px;
+            background: rgba(59,130,246,0.06);
+            border: 1px solid rgba(59,130,246,0.18);
+            border-radius: var(--radius-md);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px; color: var(--text-secondary);
+        }
+        .search-mode-banner.visible { display: flex; }
+        .search-mode-banner strong { color: var(--accent); }
+        .search-mode-banner .clear-search {
+            margin-left: auto;
+            color: var(--text-muted); cursor: pointer;
+            transition: color 0.15s;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 10px; background: none; border: none;
+            font-family: inherit; letter-spacing: inherit;
+        }
+        .search-mode-banner .clear-search:hover { color: var(--red); }
+
         /* ─── TABLE WRAPPER ─── */
         .table-wrapper {
             background: var(--bg-surface);
@@ -303,6 +433,63 @@
         .log-msg { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); max-width: 160px; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
 
         .empty-state { padding: 60px 20px; text-align: center; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+
+        /* ─── PAGINATION ─── */
+        .pagination-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-elevated);
+        }
+        .pagination-info {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px; color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+        .pagination-info span { color: var(--text-secondary); }
+
+        .pagination-controls {
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        .page-btn {
+            min-width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px; font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            padding: 0 6px;
+        }
+        .page-btn:hover:not(:disabled):not(.current) {
+            background: var(--bg-hover);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        .page-btn.current {
+            background: var(--accent-dim);
+            border-color: rgba(59,130,246,0.3);
+            color: var(--accent);
+            font-weight: 700;
+            cursor: default;
+        }
+        .page-btn:disabled {
+            opacity: 0.3; cursor: not-allowed;
+        }
+        .page-btn.nav-arrow {
+            color: var(--text-secondary);
+        }
+        .page-dots {
+            min-width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+            letter-spacing: 2px;
+        }
 
         /* ─── SIDE PANEL ─── */
         .side-panel {
@@ -419,9 +606,7 @@
             opacity: 0; pointer-events: none;
             transition: opacity 0.22s ease;
         }
-        .modal-backdrop.open {
-            opacity: 1; pointer-events: all;
-        }
+        .modal-backdrop.open { opacity: 1; pointer-events: all; }
 
         .modal {
             background: var(--bg-surface);
@@ -439,11 +624,7 @@
             transform: scale(1) translateY(0);
             opacity: 1;
         }
-
-        .modal-top-bar {
-            height: 3px;
-            background: linear-gradient(90deg, var(--green), var(--cyan), var(--accent));
-        }
+        .modal-top-bar { height: 3px; background: linear-gradient(90deg, var(--green), var(--cyan), var(--accent)); }
 
         .modal-header {
             padding: 20px 22px 16px;
@@ -459,11 +640,7 @@
         }
         .modal-header-text { flex: 1; min-width: 0; }
         .modal-title { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-        .modal-desc {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 10px; color: var(--text-muted);
-            margin-top: 4px; letter-spacing: 0.5px;
-        }
+        .modal-desc { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.5px; }
         .modal-x {
             width: 28px; height: 28px;
             background: var(--bg-elevated);
@@ -474,7 +651,6 @@
             transition: all 0.15s; flex-shrink: 0;
         }
         .modal-x:hover { background: var(--bg-hover); color: var(--text-primary); }
-
         .modal-body { padding: 20px 22px; }
 
         .select-label {
@@ -484,16 +660,11 @@
             color: var(--text-muted); margin-bottom: 10px;
             display: flex; align-items: center; gap: 6px;
         }
-        .select-label::before {
-            content: ''; width: 5px; height: 5px;
-            border-radius: 50%; background: var(--green);
-        }
+        .select-label::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
 
-        /* Concurs list as selectable cards */
         .concurs-list {
             display: flex; flex-direction: column; gap: 6px;
-            max-height: 240px; overflow-y: auto;
-            padding-right: 2px;
+            max-height: 240px; overflow-y: auto; padding-right: 2px;
         }
         .concurs-list::-webkit-scrollbar { width: 3px; }
         .concurs-list::-webkit-scrollbar-thumb { background: var(--border-light); }
@@ -508,45 +679,32 @@
             transition: all 0.15s ease;
             position: relative;
         }
-        .concurs-option:hover {
-            background: var(--bg-hover);
-            border-color: var(--border-light);
-        }
+        .concurs-option:hover { background: var(--bg-hover); border-color: var(--border-light); }
         .concurs-option.selected {
             background: rgba(16,185,129,0.08);
             border-color: rgba(16,185,129,0.35);
             box-shadow: inset 3px 0 0 var(--green);
         }
-
         .concurs-radio {
             width: 16px; height: 16px; border-radius: 50%;
             border: 2px solid var(--border-light);
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0; transition: all 0.15s ease;
         }
-        .concurs-option.selected .concurs-radio {
-            border-color: var(--green);
-            background: var(--green-dim);
-        }
+        .concurs-option.selected .concurs-radio { border-color: var(--green); background: var(--green-dim); }
         .concurs-radio-dot {
             width: 6px; height: 6px; border-radius: 50%;
-            background: var(--green);
-            opacity: 0; transform: scale(0);
+            background: var(--green); opacity: 0; transform: scale(0);
             transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
         }
         .concurs-option.selected .concurs-radio-dot { opacity: 1; transform: scale(1); }
-
-        .concurs-name {
-            font-size: 13px; font-weight: 600; color: var(--text-primary);
-            flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .concurs-name { font-size: 13px; font-weight: 600; color: var(--text-primary); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .concurs-id-tag {
             font-family: 'IBM Plex Mono', monospace; font-size: 9px;
             color: var(--text-muted); background: var(--bg-base);
             border: 1px solid var(--border); border-radius: 99px;
             padding: 2px 7px; flex-shrink: 0;
         }
-
         .concurs-loading {
             display: flex; align-items: center; justify-content: center;
             gap: 10px; padding: 28px;
@@ -558,7 +716,6 @@
             color: var(--text-muted);
             font-family: 'IBM Plex Mono', monospace; font-size: 11px;
         }
-
         .modal-footer {
             padding: 16px 22px 20px;
             border-top: 1px solid var(--border);
@@ -576,7 +733,6 @@
             cursor: pointer; transition: all 0.15s ease;
         }
         .btn-cancel:hover { background: var(--bg-hover); color: var(--text-primary); }
-
         .btn-confirm {
             display: flex; align-items: center; gap: 8px;
             padding: 9px 20px;
@@ -595,9 +751,7 @@
             box-shadow: 0 4px 16px rgba(16,185,129,0.15);
             transform: translateY(-1px);
         }
-        .btn-confirm:disabled {
-            opacity: 0.4; cursor: not-allowed;
-        }
+        .btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-confirm.loading .btn-confirm-text { display: none; }
         .btn-confirm .btn-confirm-spinner {
             display: none;
@@ -625,7 +779,6 @@
             </div>
             <span class="brand-name">AntiFraud</span>
         </div>
-
         <div class="sidebar-profile">
             <div class="profile-avatar" id="sidebar-avatar">--</div>
             <div class="profile-info">
@@ -633,7 +786,6 @@
                 <div class="profile-phone" id="sidebar-phone">—</div>
             </div>
         </div>
-
         <nav>
             <span class="nav-label">Asosiy</span>
             <a href="/form/admin/dashboard" class="nav-item" id="nav-dashboard">
@@ -689,7 +841,6 @@
                 <p class="page-subtitle" id="page-subtitle">// tizimga kirgan barcha foydalanuvchilar</p>
             </div>
             <div class="page-header-right">
-                <!-- ── DOWNLOAD BUTTON ── -->
                 <button class="btn-download" onclick="openDownloadModal()">
                     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -698,7 +849,6 @@
                     </svg>
                     Yuklab olish
                 </button>
-
                 <div class="tab-group">
                     <button class="tab-btn active-tab" id="tab-aktiv" onclick="changeStatus(false)">
                         <span class="dot"></span> Aktiv
@@ -748,6 +898,55 @@
             </div>
         </div>
 
+        <!-- ── SEARCH BAR ── -->
+        <div class="search-bar" id="search-bar">
+            <span class="search-bar-icon">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </span>
+            <select class="search-field-select" id="search-field">
+                <option value="phone">Telefon</option>
+                <option value="code">Kod</option>
+            </select>
+            <div class="search-divider"></div>
+            <input
+                    class="search-input"
+                    id="search-input"
+                    type="text"
+                    placeholder="tel(+998...) yoki kod..."
+                    autocomplete="off"
+                    spellcheck="false"
+                    oninput="onSearchInput()"
+                    onkeydown="onSearchKeydown(event)"
+            />
+            <button class="search-clear-btn" id="search-clear" onclick="clearSearch()" title="Tozalash">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="1" y1="1" x2="12" y2="12"/><line x1="12" y1="1" x2="1" y2="12"/>
+                </svg>
+            </button>
+            <button class="search-btn" id="search-btn" onclick="executeSearch()">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Izlash
+            </button>
+        </div>
+
+        <!-- Search mode banner -->
+        <div class="search-mode-banner" id="search-banner">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span>Natijalar: "<strong id="banner-query">—</strong>" · <strong id="banner-field">—</strong> bo'yicha</span>
+            <button class="clear-search" onclick="clearSearch()">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="1" y1="1" x2="10" y2="10"/><line x1="10" y1="1" x2="1" y2="10"/>
+                </svg>
+                Tozalash
+            </button>
+        </div>
+
         <!-- Table -->
         <div class="table-wrapper">
             <div class="table-header-bar">
@@ -755,6 +954,7 @@
                     <span id="table-mode-label">Aktiv foydalanuvchilar</span>
                     <span class="table-count" id="tbl-count">0 ta</span>
                 </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);" id="page-info-label"></div>
             </div>
             <div class="table-scroll">
                 <table>
@@ -777,6 +977,14 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination -->
+            <div class="pagination-bar" id="pagination-bar" style="display:none;">
+                <div class="pagination-info">
+                    Sahifa <span id="pg-current">1</span> / <span id="pg-total">1</span>
+                    &nbsp;·&nbsp; Jami <span id="pg-elements">0</span> ta yozuv
+                </div>
+                <div class="pagination-controls" id="pagination-controls"></div>
+            </div>
         </div>
 
     </div>
@@ -796,10 +1004,7 @@
         </button>
     </div>
     <div class="panel-body" id="linkedData">
-        <div class="panel-loading">
-            <div class="spin"></div>
-            <span>Kutilmoqda...</span>
-        </div>
+        <div class="panel-loading"><div class="spin"></div><span>Kutilmoqda...</span></div>
     </div>
 </div>
 
@@ -854,10 +1059,22 @@
 <div id="toast"></div>
 
 <script>
-    const API_USER = '/api/user';
+    const API_USER   = '/api/user';
     const API_REPORT = '/api/report';
-    let currentIsFraud = false;
+    const PAGE_SIZE  = 25;
+
+    let currentIsFraud    = false;
     let selectedConcursId = null;
+
+    // Pagination state
+    let currentPage  = 0;   // 0-based (Spring)
+    let totalPages   = 0;
+    let totalElements = 0;
+
+    // Search state
+    let isSearchMode    = false;
+    let lastSearchKey   = '';
+    let lastSearchField = 'phone';
 
     // ── Auth ──
     const getAuth = () => {
@@ -869,17 +1086,15 @@
             return { token, role: p.role, fullname: p.fullname, phone: p.phone, adminId: p.adminId };
         } catch { return null; }
     };
-
     const auth = getAuth();
     if (!auth) window.location.href = '/form/admin/login';
-
     const headers = () => ({ 'Authorization': `Bearer ${auth.token}` });
 
     // ── Toast ──
     function showToast(msg, type = 'success') {
         const t = document.getElementById('toast');
         t.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" style="color:${type==='success'?'var(--green)':'var(--red)'}">
-            ${type === 'success' ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}
+            ${type==='success'?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}
         </svg><span>${msg}</span>`;
         t.className = `show ${type}`;
         setTimeout(() => { t.className = ''; }, 3500);
@@ -889,29 +1104,109 @@
     function initUI() {
         const initials = (auth.fullname || '--').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
         document.getElementById('sidebar-avatar').textContent = initials;
-        document.getElementById('sidebar-name').textContent = auth.fullname || 'Admin';
-        document.getElementById('sidebar-phone').textContent = auth.phone || '';
+        document.getElementById('sidebar-name').textContent   = auth.fullname || 'Admin';
+        document.getElementById('sidebar-phone').textContent  = auth.phone || '';
     }
 
-    // ── Load Data ──
-    async function loadData() {
+    // ── Load paginated data ──
+    async function loadData(page = 0) {
+        currentPage = page;
+        isSearchMode = false;
+        updateSearchBanner(false);
+
         const isSuperAdmin = auth.role === 'super_admin';
         const url = isSuperAdmin
-            ? `${API_USER}/all?isFraud=${currentIsFraud}`
-            : `${API_USER}/list/${auth.adminId}?isFraud=${currentIsFraud}`;
+            ? `${API_USER}/all?isFraud=${currentIsFraud}&page=${page}`
+            : `${API_USER}/list/${auth.adminId}?isFraud=${currentIsFraud}&page=${page}`;
 
         try {
             const res = await fetch(url, { headers: headers() });
             if (res.status === 401 || res.status === 403) return logout();
-            const users = await res.json();
+            const data = await res.json();
+
+            // Spring Page response: { content: [], totalPages, totalElements, number, size }
+            const users = data.content ?? data;          // fallback if still returning List
+            totalPages    = data.totalPages    ?? 1;
+            totalElements = data.totalElements ?? users.length;
+            currentPage   = data.number        ?? page;
+
             renderTable(users);
+            renderPagination();
             document.getElementById('tbl-count').textContent = `${users.length} ta`;
+            document.getElementById('page-info-label').textContent =
+                totalPages > 1 ? `sahifa ${currentPage + 1} / ${totalPages}` : '';
         } catch (e) {
             showToast('Ma\'lumot yuklanmadi', 'error');
-            document.getElementById('userGrid').innerHTML = `<tr><td colspan="10"><div class="empty-state">// yuklab bo'lmadi</div></td></tr>`;
+            document.getElementById('userGrid').innerHTML =
+                `<tr><td colspan="10"><div class="empty-state">// yuklab bo'lmadi</div></td></tr>`;
         }
     }
 
+    // ── Search ──
+    function onSearchInput() {
+        const val = document.getElementById('search-input').value;
+        document.getElementById('search-clear').classList.toggle('visible', val.length > 0);
+    }
+
+    function onSearchKeydown(e) {
+        if (e.key === 'Enter') executeSearch();
+    }
+
+    async function executeSearch() {
+        const key   = document.getElementById('search-input').value.trim();
+        const field = document.getElementById('search-field').value;
+
+        if (!key) {
+            // Empty query → go back to normal paginated view
+            clearSearch();
+            return;
+        }
+
+        const btn = document.getElementById('search-btn');
+        btn.classList.add('loading');
+
+        lastSearchKey   = key;
+        lastSearchField = field;
+
+        try {
+            const url = `${API_USER}/search?adminId=${auth.adminId}&key=${encodeURIComponent(key)}&searchField=${field}`;
+            const res = await fetch(url, { headers: headers() });
+            if (res.status === 401 || res.status === 403) return logout();
+            const users = await res.json();
+
+            isSearchMode = true;
+            renderTable(users);
+            updateSearchBanner(true, key, field);
+            hidePagination();
+            document.getElementById('tbl-count').textContent = `${users.length} ta`;
+            document.getElementById('page-info-label').textContent = '';
+        } catch {
+            showToast('Qidirishda xatolik yuz berdi', 'error');
+        } finally {
+            btn.classList.remove('loading');
+        }
+    }
+
+    function clearSearch() {
+        document.getElementById('search-input').value = '';
+        document.getElementById('search-clear').classList.remove('visible');
+        isSearchMode = false;
+        updateSearchBanner(false);
+        loadData(0);
+    }
+
+    function updateSearchBanner(visible, key = '', field = '') {
+        const banner = document.getElementById('search-banner');
+        if (visible) {
+            document.getElementById('banner-query').textContent = key;
+            document.getElementById('banner-field').textContent = field === 'phone' ? 'Telefon' : 'Kod';
+            banner.classList.add('visible');
+        } else {
+            banner.classList.remove('visible');
+        }
+    }
+
+    // ── Table render ──
     function renderTable(users) {
         const tbody = document.getElementById('userGrid');
         if (!users.length) {
@@ -923,7 +1218,7 @@
                 <td class="td-id">#${u.id}</td>
                 <td class="td-phone">${u.userPhone}</td>
                 <td class="td-mono">${u.userIp}</td>
-                <td class="td-mono td-truncate" title="${u.userDeviceId}">${u.userDeviceId || '—'}</td>
+                <td class="td-mono td-truncate" title="${u.userDeviceId || ''}">${u.userDeviceId || '—'}</td>
                 <td style="color:var(--text-secondary);font-size:12px;">${u.userLocation || 'N/A'}</td>
                 <td class="td-mono" style="color:var(--cyan);font-size:10px;">${u.latitude}, ${u.longitude}</td>
                 <td class="td-mono" style="font-size:10px;">${u.ipLatitude}, ${u.ipLongitude}</td>
@@ -938,12 +1233,74 @@
         `).join('');
     }
 
+    // ── Pagination ──
+    function renderPagination() {
+        const bar = document.getElementById('pagination-bar');
+        if (totalPages <= 1) {
+            bar.style.display = 'none';
+            return;
+        }
+        bar.style.display = 'flex';
+
+        document.getElementById('pg-current').textContent  = currentPage + 1;
+        document.getElementById('pg-total').textContent    = totalPages;
+        document.getElementById('pg-elements').textContent = totalElements;
+
+        const ctrl = document.getElementById('pagination-controls');
+        ctrl.innerHTML = '';
+
+        // Prev
+        const prev = makePageBtn('‹', currentPage > 0, () => loadData(currentPage - 1), false, true);
+        ctrl.appendChild(prev);
+
+        // Page numbers with ellipsis logic
+        const pages = buildPageNumbers(currentPage, totalPages);
+        pages.forEach(p => {
+            if (p === '…') {
+                const dots = document.createElement('div');
+                dots.className = 'page-dots';
+                dots.textContent = '…';
+                ctrl.appendChild(dots);
+            } else {
+                ctrl.appendChild(makePageBtn(p + 1, true, () => loadData(p), p === currentPage, false));
+            }
+        });
+
+        // Next
+        const next = makePageBtn('›', currentPage < totalPages - 1, () => loadData(currentPage + 1), false, true);
+        ctrl.appendChild(next);
+    }
+
+    function buildPageNumbers(current, total) {
+        if (total <= 7) return Array.from({ length: total }, (_, i) => i);
+        const pages = [];
+        pages.push(0);
+        if (current > 3)          pages.push('…');
+        for (let i = Math.max(1, current - 2); i <= Math.min(total - 2, current + 2); i++) pages.push(i);
+        if (current < total - 4)  pages.push('…');
+        pages.push(total - 1);
+        return pages;
+    }
+
+    function makePageBtn(label, enabled, onClick, isCurrent, isArrow) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (isCurrent ? ' current' : '') + (isArrow ? ' nav-arrow' : '');
+        btn.textContent = label;
+        btn.disabled = !enabled;
+        if (enabled && !isCurrent) btn.addEventListener('click', onClick);
+        return btn;
+    }
+
+    function hidePagination() {
+        document.getElementById('pagination-bar').style.display = 'none';
+    }
+
     // ── Side Panel ──
     async function fetchLinked(userId, el) {
         document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('row-active'));
         el.classList.add('row-active');
 
-        const panel = document.getElementById('sidePanel');
+        const panel   = document.getElementById('sidePanel');
         const content = document.getElementById('linkedData');
         panel.classList.add('open');
         document.getElementById('main-content').classList.add('panel-open');
@@ -960,34 +1317,16 @@
                     <div class="panel-card-header">Konkurs nomi</div>
                     <div class="panel-link-id">#${l.linkName}</div>
                 </div>
-
                 <div class="panel-grid">
                     <div class="panel-card">
                         <div class="field-label">Kod</div>
                         <div class="field-value mono" style="color:var(--green)">${l.code}</div>
                     </div>
                 </div>
-
                 <div class="panel-card">
                     <div class="panel-card-header">Device ID</div>
                     <div class="field-value mono" style="font-size:10px;color:var(--text-secondary)">${l.userDeviceId}</div>
                 </div>
-
-                <div class="panel-grid">
-                    <div class="panel-card">
-                        <div class="field-label">Fraud Holati</div>
-                        <div class="field-value" style="color:${l.isFraud ? 'var(--red)' : 'var(--green)'};font-size:14px;margin-top:4px;">
-                            ${l.isFraud ? '⚠ TRUE' : '✓ FALSE'}
-                        </div>
-                    </div>
-                    <div class="panel-card">
-                        <div class="field-label">Sana</div>
-                        <div class="field-value mono" style="font-size:10px;margin-top:4px;">
-                            ${new Date(l.submittedAt).toLocaleDateString('uz-UZ')}
-                        </div>
-                    </div>
-                </div>
-
                 <div class="panel-card" style="border-color:rgba(6,182,212,0.2);background:rgba(6,182,212,0.04);">
                     <div class="panel-card-header" style="--accent:var(--cyan)">Yuborilgan Vaqt</div>
                     <div class="field-value" style="font-size:20px;font-weight:800;color:var(--cyan);letter-spacing:-0.5px;">
@@ -1009,16 +1348,22 @@
         document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('row-active'));
     }
 
+    // ── Tab switch ──
     function changeStatus(isFraud) {
         currentIsFraud = isFraud;
         document.getElementById('tab-aktiv').className = `tab-btn ${!isFraud ? 'active-tab' : ''}`;
         document.getElementById('tab-fraud').className = `tab-btn fraud-tab ${isFraud ? 'active-tab' : ''}`;
         document.getElementById('table-mode-label').textContent = isFraud ? 'Fraud foydalanuvchilar' : 'Aktiv foydalanuvchilar';
+
+        // Reset search when switching tab
+        document.getElementById('search-input').value = '';
+        document.getElementById('search-clear').classList.remove('visible');
+
         closePanel();
-        loadData();
+        loadData(0);
     }
 
-    // ── DOWNLOAD MODAL ──
+    // ── Download Modal ──
     async function openDownloadModal() {
         selectedConcursId = null;
         document.getElementById('btn-confirm-dl').disabled = true;
@@ -1043,9 +1388,7 @@
 
             list.innerHTML = concurses.map(c => `
                 <div class="concurs-option" onclick="selectConcurs(${c.id}, this)" data-id="${c.id}">
-                    <div class="concurs-radio">
-                        <div class="concurs-radio-dot"></div>
-                    </div>
+                    <div class="concurs-radio"><div class="concurs-radio-dot"></div></div>
                     <span class="concurs-name">${c.name}</span>
                     <span class="concurs-id-tag">#${c.id}</span>
                 </div>
@@ -1072,14 +1415,11 @@
     }
 
     function handleModalBackdropClick(e) {
-        if (e.target === document.getElementById('downloadModal')) {
-            closeDownloadModal();
-        }
+        if (e.target === document.getElementById('downloadModal')) closeDownloadModal();
     }
 
     async function downloadReport() {
         if (!selectedConcursId) return;
-
         const btn = document.getElementById('btn-confirm-dl');
         btn.disabled = true;
         btn.classList.add('loading');
@@ -1089,17 +1429,13 @@
                 `${API_REPORT}/fraud-excel/${auth.adminId}/${selectedConcursId}`,
                 { headers: headers() }
             );
-
             if (!res.ok) throw new Error('Server xatosi');
 
             const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `fraud_report_concurs_${selectedConcursId}.xlsx`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href = url; a.download = `fraud_report_concurs_${selectedConcursId}.xlsx`;
+            document.body.appendChild(a); a.click(); a.remove();
             URL.revokeObjectURL(url);
 
             closeDownloadModal();
@@ -1111,9 +1447,24 @@
         }
     }
 
-    // ── Keyboard close ──
+    // ── Totals ──
+    async function loadTotals() {
+        try {
+            const res = await fetch(`${API_USER}/totals/${auth.adminId}`, { headers: headers() });
+            if (!res.ok) throw new Error();
+            const t = await res.json();
+            document.getElementById('stat-showing').textContent    = t.total    ?? '—';
+            document.getElementById('stat-fraud-count').textContent = t.fraud   ?? '—';
+            document.getElementById('stat-safe-count').textContent  = t.nonFraud ?? '—';
+        } catch { /* silently keep em-dashes */ }
+    }
+
+    // ── Keyboard ──
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeDownloadModal();
+        if (e.key === 'Escape') {
+            closeDownloadModal();
+            if (document.getElementById('sidePanel').classList.contains('open')) closePanel();
+        }
     });
 
     function logout() {
@@ -1121,21 +1472,7 @@
         window.location.href = '/form/admin/login';
     }
 
-    // ── Load Totals ──
-    async function loadTotals() {
-        try {
-            const res = await fetch(`${API_USER}/totals/${auth.adminId}`, { headers: headers() });
-            if (!res.ok) throw new Error();
-            const t = await res.json();
-            document.getElementById('stat-showing').textContent  = t.total    ?? '—';
-            document.getElementById('stat-fraud-count').textContent = t.fraud ?? '—';
-            document.getElementById('stat-safe-count').textContent  = t.nonFraud ?? '—';
-        } catch {
-            // silently leave the em-dashes; table still works
-        }
-    }
-
-    window.addEventListener('load', () => { initUI(); loadData(); loadTotals(); });
+    window.addEventListener('load', () => { initUI(); loadData(0); loadTotals(); });
 </script>
 </body>
 </html>

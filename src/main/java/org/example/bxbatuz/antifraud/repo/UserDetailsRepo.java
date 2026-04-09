@@ -1,6 +1,8 @@
 package org.example.bxbatuz.antifraud.repo;
 
 import org.example.bxbatuz.antifraud.entity.UserDetails;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,10 +12,13 @@ import java.util.List;
 
 @Repository
 public interface UserDetailsRepo extends JpaRepository<UserDetails, Long> {
-    List<UserDetails> findByIsFraud(Boolean isFraud);
+    Page<UserDetails> findByIsFraud(Boolean isFraud, Pageable pageable);
 
     boolean existsByUserPhone(String phone);
     UserDetails findByUserPhone(String phone);
+    @Query(value = """
+            select * from user_details where user_phone=:phone and admin_id=:adminId""", nativeQuery = true)
+    List<UserDetails> findByUserPhoneAll(@Param("phone") String phone, @Param("adminId") Long adminId);
 
     @Query(value = """
     SELECT EXISTS (
@@ -47,5 +52,5 @@ public interface UserDetailsRepo extends JpaRepository<UserDetails, Long> {
     UserDetails findByUserDeviceId(String userDeviceId);
     List<UserDetails> findByAdminId(Long adminId);
 
-    List<UserDetails> findByAdminIdAndIsFraud(Long adminId, Boolean isExpired);
+    Page<UserDetails> findByAdminIdAndIsFraud(Long adminId, Boolean isExpired, Pageable pageable);
 }
