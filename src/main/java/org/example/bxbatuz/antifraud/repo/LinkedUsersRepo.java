@@ -53,5 +53,5 @@ public interface LinkedUsersRepo extends JpaRepository<LinkedUsers, Long> {
             select lu.* from linked_users lu.concurs_id=:concursId """, nativeQuery = true)
     List<LinkedUsers> findByAdminIdAndConcursId(@Param("userId") Long userId);
 
-    LinkedUsers findByUserCode(String userCode);
+    List<LinkedUsers> findByUserCode(String userCode);
 }

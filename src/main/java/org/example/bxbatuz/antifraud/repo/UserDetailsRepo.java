@@ -15,7 +15,9 @@ public interface UserDetailsRepo extends JpaRepository<UserDetails, Long> {
     Page<UserDetails> findByIsFraud(Boolean isFraud, Pageable pageable);
 
     boolean existsByUserPhone(String phone);
-    UserDetails findByUserPhone(String phone);
+    @Query(value = """
+            select * from user_details where user_phone in (:phone)""", nativeQuery = true)
+    List<UserDetails> findByUserPhone(@Param("phone") List<String> phone);
     @Query(value = """
             select * from user_details where user_phone=:phone and admin_id=:adminId""", nativeQuery = true)
     List<UserDetails> findByUserPhoneAll(@Param("phone") String phone, @Param("adminId") Long adminId);

@@ -184,9 +184,12 @@ public class UserService {
         if (searchField.equals("phone"))
             userDetailsList = userDetailsRepo.findByUserPhoneAll(key, adminId);
         else {
-            LinkedUsers linkedUser = linkedUsersRepo.findByUserCode(key);
-            UserDetails byUserPhone = userDetailsRepo.findByUserPhone(linkedUser.getUserPhone());
-            userDetailsList = byUserPhone.getAdminId().equals(adminId) ? List.of(byUserPhone) : List.of();
+            List<LinkedUsers> linkedUsers = linkedUsersRepo.findByUserCode(key);
+            List<String> list = linkedUsers.stream().map(LinkedUsers::getUserPhone).toList();
+            List<UserDetails> byUserPhone = userDetailsRepo.findByUserPhone(list);
+            userDetailsList = byUserPhone.stream()
+                    .filter(v -> v.getAdminId().equals(adminId))
+                    .toList();
         }
         return ResponseEntity.ok(userDetailsList);
     }
