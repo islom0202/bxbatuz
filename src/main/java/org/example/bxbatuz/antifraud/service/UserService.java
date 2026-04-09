@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -180,12 +181,31 @@ public class UserService {
 
     public ResponseEntity<List<UserDetails>> search(
             Long adminId, String key, String searchField) {
+        List<String> list;
+        List<LinkedUsers> linkedUsers;
         List<UserDetails> userDetailsList;
-        if (searchField.equals("phone"))
+
+        AdminDetails admin = adminDetailsRepo.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("admin topilmadi!"));
+
+        if (admin.getRole().equals("super_admin")) {
+            if (searchField.equals("phone")) {
+                userDetailsList = userDetailsRepo.findByUserPhoneAll(key);
+            }
+            else {
+                linkedUsers = linkedUsersRepo.findByUserCode(key);
+                list = linkedUsers.stream().map(LinkedUsers::getUserPhone).toList();
+                List<UserDetails> byUserPhone = userDetailsRepo.findByUserPhone(list);
+                userDetailsList = byUserPhone.stream()
+                        .filter(v -> v.getAdminId().equals(adminId))
+                        .toList();
+            }
+        }
+        else if (searchField.equals("phone"))
             userDetailsList = userDetailsRepo.findByUserPhoneAll(key, adminId);
         else {
-            List<LinkedUsers> linkedUsers = linkedUsersRepo.findByUserCode(key);
-            List<String> list = linkedUsers.stream().map(LinkedUsers::getUserPhone).toList();
+            linkedUsers = linkedUsersRepo.findByUserCode(key);
+            list = linkedUsers.stream().map(LinkedUsers::getUserPhone).toList();
             List<UserDetails> byUserPhone = userDetailsRepo.findByUserPhone(list);
             userDetailsList = byUserPhone.stream()
                     .filter(v -> v.getAdminId().equals(adminId))

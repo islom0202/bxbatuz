@@ -55,4 +55,8 @@ public interface UserDetailsRepo extends JpaRepository<UserDetails, Long> {
     List<UserDetails> findByAdminId(Long adminId);
 
     Page<UserDetails> findByAdminIdAndIsFraud(Long adminId, Boolean isExpired, Pageable pageable);
+
+    @Query(value = """
+            select * from user_details where user_phone=:phone""", nativeQuery = true)
+    List<UserDetails> findByUserPhoneAll(@Param("phone") String phone);
 }
