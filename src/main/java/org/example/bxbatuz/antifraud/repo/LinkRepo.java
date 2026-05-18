@@ -52,6 +52,7 @@ public interface LinkRepo extends JpaRepository<Links, Long> {
             where isExpired=FALSE and id in :linkIds""")
     void updateLinkStatus(@Param("linkIds") List<Long> linkIds);
 
+
     Integer countByIsExpired(Boolean isExpired);
 
     @Query(value = """
