@@ -16,6 +16,7 @@ public class BxbatuzApplication {
         SpringApplication.run(BxbatuzApplication.class, args);
     }
 
+    
     @Bean
     public DatabaseReader databaseReader() throws IOException {
         File dbFile = new File("/home/ec2-user/app/GeoLite2-City.mmdb");
